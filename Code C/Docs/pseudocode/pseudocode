@@ -1,0 +1,111 @@
+//include section
+//define and configuration section
+
+
+
+//external variable declarations and function prototypes for testing and implementation section
+
+input = {voltage, current}
+output = {soc}
+struct soc_parameters {};
+void soc_init
+void soc_update
+void get_soc
+
+//static variables and prototype for interrupt handler and disturbances
+
+// vffrls variable
+Matrix covariance
+Matrix kalman_gain
+Matrix phi
+Matrix theta
+float priori_voltage
+float estimate_voltage
+float error_voltage
+
+
+
+// vffrls prototype
+phi_update
+estimate_voltage_update
+error_voltage_update
+covariance_update
+kalman_gain_update
+theta_update
+parameter_update
+
+
+
+
+//static variables and prototype for calculating section
+// vffrls calculation variables
+covariance_update{covariance, identity_matrix, m_covariance_update}
+kalman_gain_update{kalman_gain, t_kalmanGain_update, lamda}
+theta_update{theta, d_theta_update}
+parameter_update
+
+//method for implementation
+void vffrls_init(){
+	phi[0] = voltage;
+	phi[1] = voltage;
+	phi[2] = phi[3] = 0;
+	
+}
+void vffrls_update_input(const float terminalVoltage, const float current, SOC_Input input);
+void vffrls_update();
+//
+
+
+
+// aukf algorithm
+
+define action
+	fetch: input, no alter
+	pull: input, alter
+	use: the component for the prototype, reset
+	reuse: the component for the prototype, no reset
+	push: output, alter
+	give: output, no alter
+
+	create_sigma_points{sigma_points[3*7], generated_matrix_1[3*3], generated_matrix_2[3*3]}
+	fetch estimateState stateCovariance
+	push sigmaPoints
+	use generated_matrix_1 generated_matrix_2
+	
+	time_update_sigma_state{sigma_state[3*7], vector_1[3*1], generated_matrix_1[3*7]}
+	pull sigma_state
+	use ((matrixB*observedMeasurement)->vector_1->generated_matrix_1)+matrixA*sigmaPoints
+	push sigmaPoints
+	
+	time_update_predict_state{}
+	pull prioriEstimateState
+	fetch sigmaPoints m_weight
+	
+	time_update_sigmaStateError{}
+	pull sigmaStateError
+	fetch sigmaPoints prioriEstimateState
+	
+	time_update_state_covariance{multiplier_1[3*1], multiplier_2[1*3], multiplier_3[3*3], }
+	pull stateCovariance
+	use m1_time_update_state_covariance m2_time_update_state_covariance m3_time_update_state_covariance
+	
+		
+	update_system{}
+	
+	create_sigma_points{}
+	fetch prioriEstimateState stateCovariance
+	push sigmaPoints
+	use generated_matrix_1 generated_matrix_2
+	
+	time_update_sigma_measurements{generated_matrix[2*7]}
+	time_update_measurement{}
+	update_sigma_measurement_error{generated_matrix[2*7]}
+	update_measurement_covariance{}
+	update_cross_covariance{multiply_matrix[3*1]}
+	
+	update_kalman_gain{}
+	update_state{multiply_matrix[3*1]}
+	update_state_covariance{transpose_matrix[1*3], multiply_matrix[3*3]}
+	
+	estimate_state_bounder{}
+	update_output{}
