@@ -20,13 +20,11 @@
 #define DYNAMIC_DIM				2
 
 const char *data_file_path = "input.csv";
-const char *soh_data_file_path = "soh_data.csv";
 const char *output_ocv_data_file = "output.csv";
 
 //static void task_300ms_update_battery_model(void);
 
 static BMS_Input_Vector input_vector[INPUT_SAMPLE_SIZE];
-static float soh[SOH_SAMPLE_SIZE];
 FILE *out_file;
 
 
@@ -160,12 +158,6 @@ int main(void) {
 		return -1;
 	}
 	printf("Sample size: %d", sample_size);
-	int32_t test_cycles = load_soh_data_from_csv_file(soh_data_file_path,
-			(float*) soh, SOH_SAMPLE_SIZE);
-	if (test_cycles <= 0) {
-		return -1;
-	}
-	printf("Test cycles: %d", test_cycles);
 
 	create_est_data(output_ocv_data_file, out_file);
 	cell_vol = input_vector[0].terminalVoltage;

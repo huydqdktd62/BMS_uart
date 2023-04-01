@@ -122,16 +122,12 @@ void process_handle(char* buff,uint32_t len){
 
     SOC_Input input;
     string_split(buff,",",buff_soc);
-    input.pack_voltage = (int32_t)atoi(buff_soc[0]);
+    input.pack_voltage = (uint32_t)atoi(buff_soc[0]);
     input.pack_current = (int32_t)atoi(buff_soc[1]);
 
     for(uint16_t i = 0; i< SOC_PERIOD;i++){
         ukf_update(input, 1);
     }
-
-//    sprintf(print_buff,"%f,", 3.14);
-//    uart_print(print_buff);
-//    uart_print("%f", 3.14f);
     uart_print("%d,%d,%d,%d,",soc_output.SOC,(int32_t)(soc_output.SOC_f*1000000000.0f),input.pack_voltage,input.pack_current);
     uart_print("%d,%d,",(int32_t)(RC_param*1000000000.0f), (int32_t)(H_param*1000000000.0f));
     int i;
