@@ -130,3 +130,7 @@ Code BMS/Debug/src/service/soc_ukf/soc_vffrls.o
 Code BMS/Debug/src/service/soc_ukf/subdir.mk
 Code BMS/Debug/src/test/subdir.mk
 Code BMS/Debug/src/test/test.o
+build-TestSOC_Huy-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/Log.txt
+build-TestSOC_Huy-Desktop_Qt_5_15_2_MinGW_64_bit-Debug/input.csv
+Code C/Debug/main.o
+Code C/output.csv

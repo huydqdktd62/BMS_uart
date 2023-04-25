@@ -108,41 +108,41 @@ static int32_t save_est_data(const char *file_path, const uint32_t pack_voltage,
 			soc_output.SOC_f);
 	fprintf(out_file, "%d,%d,", soc_input.pack_voltage,
 			soc_input.pack_current);
-	fprintf(out_file, "%.9f,", H_param);
+	fprintf(out_file, "%.12f,", H_param);
 	int i;
 	for (i = 0; i < 3; i++)
-		fprintf(out_file, "%.9f,", estimate_state_entries[i]);
+		fprintf(out_file, "%.12f,", estimate_state_entries[i]);
 
 	for (i = 0; i < 9; i++)
-		fprintf(out_file, "%.9f,", state_covariance_entries[i]);
+		fprintf(out_file, "%.12f,", state_covariance_entries[i]);
 
 	for (i = 0; i < 21; i++)
-		fprintf(out_file, "%.9f,", sigma_points_entries[i]);
+		fprintf(out_file, "%.12f,", sigma_points_entries[i]);
 	fprintf(out_file, "%f,%f,%f,", priori_estimate_state_entries[0],
 			priori_estimate_state_entries[1],
 			priori_estimate_state_entries[2]);
 	for (i = 0; i < 21; i++)
-		fprintf(out_file, "%.9f,", sigma_state_error_entries[i]);
-	fprintf(out_file, "%.9f,%.9f,", measurement_cov,
+		fprintf(out_file, "%.12f,", sigma_state_error_entries[i]);
+	fprintf(out_file, "%.12f,%.12f,", measurement_cov,
 			est_measurement);
 	for (i = 0; i < 3; i++)
-		fprintf(out_file, "%.9f,", cross_covariance_entries[i]);
+		fprintf(out_file, "%.12f,", cross_covariance_entries[i]);
 	for (i = 0; i < 3; i++)
-		fprintf(out_file, "%.9f,", aukf_kalman_gain_entries[i]);
+		fprintf(out_file, "%.12f,", aukf_kalman_gain_entries[i]);
 	for (i = 0; i < 9; i++)
-		fprintf(out_file, "%.9f,", matrix_A_entries[i]);
+		fprintf(out_file, "%.12f,", matrix_A_entries[i]);
 	for (i = 0; i < 6; i++)
-		fprintf(out_file, "%.9f,", matrix_B_entries[i]);
+		fprintf(out_file, "%.12f,", matrix_B_entries[i]);
 	for (i = 0; i < 3; i++)
-		fprintf(out_file, "%.9f,", matrix_C_entries[i]);
+		fprintf(out_file, "%.12f,", matrix_C_entries[i]);
 	for (i = 0; i < 2; i++)
-		fprintf(out_file, "%.9f,", matrix_D_entries[i]);
-	fprintf(out_file, "%.9f,%.9f,", observed_measurement_entries[0],
+		fprintf(out_file, "%.12f,", matrix_D_entries[i]);
+	fprintf(out_file, "%.12f,%.12f,", observed_measurement_entries[0],
 			observed_measurement_entries[1]);
 	for (i = 0; i < 7; i++)
-		fprintf(out_file, "%.9f,", sigma_measurements_entries[i]);
+		fprintf(out_file, "%.12f,", sigma_measurements_entries[i]);
 	for (i = 0; i < 7; i++)
-		fprintf(out_file, "%.9f,", sigma_measurement_error_entries[i]);
+		fprintf(out_file, "%.12f,", sigma_measurement_error_entries[i]);
 
 	fprintf(out_file, "\n");
 	fclose(out_file);
