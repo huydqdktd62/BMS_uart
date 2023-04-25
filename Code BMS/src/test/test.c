@@ -143,7 +143,7 @@ void process_handle(char* buff,uint32_t len){
     for (i = 0; i < 21; i++)
         uart_print( "%d,", (int32_t)(sigma_state_error_entries[i]*1000000000.0f));
     uart_print( "%d,%d,", (int32_t)(measurement_cov*1000000000.0f),
-            (int32_t)(est_measurement*1000000000.0f));
+            (int32_t)(est_measurement*1000000.0f));
     for (i = 0; i < 3; i++)
         uart_print( "%d,", (int32_t)(cross_covariance_entries[i]*1000000000.0f));
     for (i = 0; i < 3; i++)
@@ -153,7 +153,7 @@ void process_handle(char* buff,uint32_t len){
     for (i = 0; i < 6; i++)
         uart_print( "%d,", (int32_t)(matrix_B_entries[i]*1000000000.0f));
     for (i = 0; i < 3; i++)
-        uart_print( "%d,", (int32_t)(matrix_C_entries[i]*1000000000.0f));
+        uart_print( "%d,", (int32_t)(matrix_C_entries[i]*1000000.0f));
     for (i = 0; i < 2; i++)
         uart_print( "%d,", (int32_t)(matrix_D_entries[i]*1000000000.0f));
     uart_print( "%d,%d,", (int32_t)(observed_measurement_entries[0]*1000000000.0f),

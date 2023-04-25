@@ -364,7 +364,7 @@ Discarded input sections
  .data          0x00000000        0x0 ./src/service/modbus/functions/mbfuncdiag.o
  .bss           0x00000000        0x0 ./src/service/modbus/functions/mbfuncdiag.o
  .debug_line    0x00000000        0x0 ./src/service/modbus/functions/mbfuncdiag.o
- .debug_str     0x00000000      0x13c ./src/service/modbus/functions/mbfuncdiag.o
+ .debug_str     0x00000000      0x13e ./src/service/modbus/functions/mbfuncdiag.o
  .comment       0x00000000       0x4a ./src/service/modbus/functions/mbfuncdiag.o
  .ARM.attributes
                 0x00000000       0x3a ./src/service/modbus/functions/mbfuncdiag.o
@@ -599,7 +599,7 @@ Discarded input sections
                 0x00000000       0x40 ./src/service/canopen/CO.o
  .debug_ranges  0x00000000       0x78 ./src/service/canopen/CO.o
  .debug_line    0x00000000      0x42a ./src/service/canopen/CO.o
- .debug_str     0x00000000     0x10ea ./src/service/canopen/CO.o
+ .debug_str     0x00000000     0x10ec ./src/service/canopen/CO.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO.o
  .debug_frame   0x00000000       0xa0 ./src/service/canopen/CO.o
  .ARM.attributes
@@ -617,7 +617,7 @@ Discarded input sections
                 0x00000000       0x20 ./src/service/canopen/CO_CAN_Msg.o
  .debug_ranges  0x00000000       0x10 ./src/service/canopen/CO_CAN_Msg.o
  .debug_line    0x00000000      0x17f ./src/service/canopen/CO_CAN_Msg.o
- .debug_str     0x00000000      0x2a7 ./src/service/canopen/CO_CAN_Msg.o
+ .debug_str     0x00000000      0x2a9 ./src/service/canopen/CO_CAN_Msg.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_CAN_Msg.o
  .debug_frame   0x00000000       0x20 ./src/service/canopen/CO_CAN_Msg.o
  .ARM.attributes
@@ -636,7 +636,7 @@ Discarded input sections
                 0x00000000       0x20 ./src/service/canopen/CO_CRC.o
  .debug_ranges  0x00000000       0x10 ./src/service/canopen/CO_CRC.o
  .debug_line    0x00000000      0x1e6 ./src/service/canopen/CO_CRC.o
- .debug_str     0x00000000      0x245 ./src/service/canopen/CO_CRC.o
+ .debug_str     0x00000000      0x247 ./src/service/canopen/CO_CRC.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_CRC.o
  .debug_frame   0x00000000       0x2c ./src/service/canopen/CO_CRC.o
  .ARM.attributes
@@ -652,7 +652,7 @@ Discarded input sections
                 0x00000000       0x20 ./src/service/canopen/CO_EMCY.o
  .debug_ranges  0x00000000       0x28 ./src/service/canopen/CO_EMCY.o
  .debug_line    0x00000000      0x18d ./src/service/canopen/CO_EMCY.o
- .debug_str     0x00000000      0x2e8 ./src/service/canopen/CO_EMCY.o
+ .debug_str     0x00000000      0x2ea ./src/service/canopen/CO_EMCY.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_EMCY.o
  .debug_frame   0x00000000       0x20 ./src/service/canopen/CO_EMCY.o
  .ARM.attributes
@@ -673,7 +673,7 @@ Discarded input sections
                 0x00000000       0x30 ./src/service/canopen/CO_FLASH.o
  .debug_ranges  0x00000000       0x20 ./src/service/canopen/CO_FLASH.o
  .debug_line    0x00000000      0x289 ./src/service/canopen/CO_FLASH.o
- .debug_str     0x00000000      0x3b8 ./src/service/canopen/CO_FLASH.o
+ .debug_str     0x00000000      0x3ba ./src/service/canopen/CO_FLASH.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_FLASH.o
  .debug_frame   0x00000000       0x50 ./src/service/canopen/CO_FLASH.o
  .ARM.attributes
@@ -686,7 +686,7 @@ Discarded input sections
  .debug_aranges
                 0x00000000       0x18 ./src/service/canopen/CO_NMT.o
  .debug_line    0x00000000       0x1d ./src/service/canopen/CO_NMT.o
- .debug_str     0x00000000      0x13d ./src/service/canopen/CO_NMT.o
+ .debug_str     0x00000000      0x13f ./src/service/canopen/CO_NMT.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_NMT.o
  .ARM.attributes
                 0x00000000       0x3a ./src/service/canopen/CO_NMT.o
@@ -702,7 +702,7 @@ Discarded input sections
                 0x00000000       0x20 ./src/service/canopen/CO_OD.o
  .debug_ranges  0x00000000       0x10 ./src/service/canopen/CO_OD.o
  .debug_line    0x00000000      0x20e ./src/service/canopen/CO_OD.o
- .debug_str     0x00000000      0x333 ./src/service/canopen/CO_OD.o
+ .debug_str     0x00000000      0x335 ./src/service/canopen/CO_OD.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_OD.o
  .debug_frame   0x00000000       0x28 ./src/service/canopen/CO_OD.o
  .ARM.attributes
@@ -721,7 +721,7 @@ Discarded input sections
                 0x00000000       0x28 ./src/service/canopen/CO_OD_sign.o
  .debug_ranges  0x00000000       0x18 ./src/service/canopen/CO_OD_sign.o
  .debug_line    0x00000000      0x1cd ./src/service/canopen/CO_OD_sign.o
- .debug_str     0x00000000      0x2ae ./src/service/canopen/CO_OD_sign.o
+ .debug_str     0x00000000      0x2b0 ./src/service/canopen/CO_OD_sign.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_OD_sign.o
  .debug_frame   0x00000000       0x30 ./src/service/canopen/CO_OD_sign.o
  .ARM.attributes
@@ -747,7 +747,7 @@ Discarded input sections
                 0x00000000       0x38 ./src/service/canopen/CO_OD_storage.o
  .debug_ranges  0x00000000      0x138 ./src/service/canopen/CO_OD_storage.o
  .debug_line    0x00000000      0x6ff ./src/service/canopen/CO_OD_storage.o
- .debug_str     0x00000000      0x97f ./src/service/canopen/CO_OD_storage.o
+ .debug_str     0x00000000      0x981 ./src/service/canopen/CO_OD_storage.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_OD_storage.o
  .debug_frame   0x00000000       0x7c ./src/service/canopen/CO_OD_storage.o
  .ARM.attributes
@@ -760,7 +760,7 @@ Discarded input sections
  .debug_aranges
                 0x00000000       0x18 ./src/service/canopen/CO_Object.o
  .debug_line    0x00000000       0x1d ./src/service/canopen/CO_Object.o
- .debug_str     0x00000000      0x1bb ./src/service/canopen/CO_Object.o
+ .debug_str     0x00000000      0x1bd ./src/service/canopen/CO_Object.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_Object.o
  .ARM.attributes
                 0x00000000       0x3a ./src/service/canopen/CO_Object.o
@@ -785,7 +785,7 @@ Discarded input sections
                 0x00000000       0x30 ./src/service/canopen/CO_PDO.o
  .debug_ranges  0x00000000       0xa0 ./src/service/canopen/CO_PDO.o
  .debug_line    0x00000000      0x452 ./src/service/canopen/CO_PDO.o
- .debug_str     0x00000000      0x56c ./src/service/canopen/CO_PDO.o
+ .debug_str     0x00000000      0x56e ./src/service/canopen/CO_PDO.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_PDO.o
  .debug_frame   0x00000000       0x7c ./src/service/canopen/CO_PDO.o
  .ARM.attributes
@@ -798,7 +798,7 @@ Discarded input sections
  .debug_aranges
                 0x00000000       0x18 ./src/service/canopen/CO_RPDO.o
  .debug_line    0x00000000       0x1d ./src/service/canopen/CO_RPDO.o
- .debug_str     0x00000000      0x1bf ./src/service/canopen/CO_RPDO.o
+ .debug_str     0x00000000      0x1c1 ./src/service/canopen/CO_RPDO.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_RPDO.o
  .ARM.attributes
                 0x00000000       0x3a ./src/service/canopen/CO_RPDO.o
@@ -820,7 +820,7 @@ Discarded input sections
                 0x00000000       0x38 ./src/service/canopen/CO_SDO.o
  .debug_ranges  0x00000000       0x80 ./src/service/canopen/CO_SDO.o
  .debug_line    0x00000000      0x320 ./src/service/canopen/CO_SDO.o
- .debug_str     0x00000000      0x868 ./src/service/canopen/CO_SDO.o
+ .debug_str     0x00000000      0x86a ./src/service/canopen/CO_SDO.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_SDO.o
  .debug_frame   0x00000000       0x5c ./src/service/canopen/CO_SDO.o
  .ARM.attributes
@@ -845,7 +845,7 @@ Discarded input sections
                 0x00000000       0x38 ./src/service/canopen/CO_SDOclient.o
  .debug_ranges  0x00000000      0x480 ./src/service/canopen/CO_SDOclient.o
  .debug_line    0x00000000      0xee7 ./src/service/canopen/CO_SDOclient.o
- .debug_str     0x00000000     0x130b ./src/service/canopen/CO_SDOclient.o
+ .debug_str     0x00000000     0x130d ./src/service/canopen/CO_SDOclient.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_SDOclient.o
  .debug_frame   0x00000000       0x88 ./src/service/canopen/CO_SDOclient.o
  .ARM.attributes
@@ -868,7 +868,7 @@ Discarded input sections
                 0x00000000       0x38 ./src/service/canopen/CO_SDOserver.o
  .debug_ranges  0x00000000      0x658 ./src/service/canopen/CO_SDOserver.o
  .debug_line    0x00000000     0x10ca ./src/service/canopen/CO_SDOserver.o
- .debug_str     0x00000000     0x137b ./src/service/canopen/CO_SDOserver.o
+ .debug_str     0x00000000     0x137d ./src/service/canopen/CO_SDOserver.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_SDOserver.o
  .debug_frame   0x00000000       0x74 ./src/service/canopen/CO_SDOserver.o
  .ARM.attributes
@@ -893,7 +893,7 @@ Discarded input sections
                 0x00000000       0x40 ./src/service/canopen/CO_SYNC.o
  .debug_ranges  0x00000000      0x190 ./src/service/canopen/CO_SYNC.o
  .debug_line    0x00000000      0x522 ./src/service/canopen/CO_SYNC.o
- .debug_str     0x00000000      0x92e ./src/service/canopen/CO_SYNC.o
+ .debug_str     0x00000000      0x930 ./src/service/canopen/CO_SYNC.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_SYNC.o
  .debug_frame   0x00000000       0x9c ./src/service/canopen/CO_SYNC.o
  .ARM.attributes
@@ -922,7 +922,7 @@ Discarded input sections
                 0x00000000       0x50 ./src/service/canopen/CO_TPDO.o
  .debug_ranges  0x00000000       0x40 ./src/service/canopen/CO_TPDO.o
  .debug_line    0x00000000      0x44b ./src/service/canopen/CO_TPDO.o
- .debug_str     0x00000000      0x7de ./src/service/canopen/CO_TPDO.o
+ .debug_str     0x00000000      0x7e0 ./src/service/canopen/CO_TPDO.o
  .comment       0x00000000       0x4a ./src/service/canopen/CO_TPDO.o
  .debug_frame   0x00000000       0x98 ./src/service/canopen/CO_TPDO.o
  .ARM.attributes
@@ -3721,7 +3721,7 @@ LOAD linker stubs
  .debug_line    0x0000ae57      0x230 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
  .debug_line    0x0000b087      0x499 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
 
-.debug_str      0x00000000     0xdf18
+.debug_str      0x00000000     0xdee1
  .debug_str     0x00000000     0x41de ./src/test/test.o
                                0x43ec (size before relaxing)
  .debug_str     0x000041de       0xab ./src/service/soc_ukf/battery_model.o
@@ -3732,49 +3732,49 @@ LOAD linker stubs
                                 0x45e (size before relaxing)
  .debug_str     0x00004b09       0xc5 ./src/service/math/math_util.o
                                 0x307 (size before relaxing)
- .debug_str     0x00004bce      0x10d ./src/service/math/matrix.o
-                                0x314 (size before relaxing)
- .debug_str     0x00004cdb       0x44 ./src/service/fifo/fifo.o
+ .debug_str     0x00004bce       0xd6 ./src/service/math/matrix.o
+                                0x316 (size before relaxing)
+ .debug_str     0x00004ca4       0x44 ./src/service/fifo/fifo.o
                                 0x26d (size before relaxing)
- .debug_str     0x00004d1f       0x84 ./ra_gen/common_data.o
+ .debug_str     0x00004ce8       0x84 ./ra_gen/common_data.o
                                0x3257 (size before relaxing)
- .debug_str     0x00004da3     0x2dfc ./ra_gen/hal_data.o
+ .debug_str     0x00004d6c     0x2dfc ./ra_gen/hal_data.o
                                0x6c6e (size before relaxing)
- .debug_str     0x00007b9f       0x16 ./ra_gen/main.o
+ .debug_str     0x00007b68       0x16 ./ra_gen/main.o
                                 0x1c6 (size before relaxing)
- .debug_str     0x00007bb5      0x5d6 ./ra_gen/pin_data.o
+ .debug_str     0x00007b7e      0x5d6 ./ra_gen/pin_data.o
                                0x1cd6 (size before relaxing)
- .debug_str     0x0000818b     0x149e ./ra_gen/vector_data.o
+ .debug_str     0x00008154     0x149e ./ra_gen/vector_data.o
                                0x163e (size before relaxing)
- .debug_str     0x00009629     0x21b5 ./ra/fsp/src/r_sci_uart/r_sci_uart.o
+ .debug_str     0x000095f2     0x21b5 ./ra/fsp/src/r_sci_uart/r_sci_uart.o
                                0x654c (size before relaxing)
- .debug_str     0x0000b7de      0x77e ./ra/fsp/src/r_ioport/r_ioport.o
+ .debug_str     0x0000b7a7      0x77e ./ra/fsp/src/r_ioport/r_ioport.o
                                0x5494 (size before relaxing)
- .debug_str     0x0000bf5c      0x99d ./ra/fsp/src/r_gpt/r_gpt.o
+ .debug_str     0x0000bf25      0x99d ./ra/fsp/src/r_gpt/r_gpt.o
                                0x5e73 (size before relaxing)
- .debug_str     0x0000c8f9      0x3a1 ./ra/fsp/src/r_can/r_can.o
+ .debug_str     0x0000c8c2      0x3a1 ./ra/fsp/src/r_can/r_can.o
                                0x33e0 (size before relaxing)
- .debug_str     0x0000cc9a      0x6b4 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
+ .debug_str     0x0000cc63      0x6b4 ./ra/fsp/src/bsp/mcu/all/bsp_clocks.o
                                0x1ecc (size before relaxing)
- .debug_str     0x0000d34e      0x10b ./ra/fsp/src/bsp/mcu/all/bsp_common.o
+ .debug_str     0x0000d317      0x10b ./ra/fsp/src/bsp/mcu/all/bsp_common.o
                                0x1a69 (size before relaxing)
- .debug_str     0x0000d459       0xbc ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
+ .debug_str     0x0000d422       0xbc ./ra/fsp/src/bsp/mcu/all/bsp_delay.o
                                 0x2ef (size before relaxing)
- .debug_str     0x0000d515      0x1de ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
+ .debug_str     0x0000d4de      0x1de ./ra/fsp/src/bsp/mcu/all/bsp_group_irq.o
                                0x1f74 (size before relaxing)
- .debug_str     0x0000d6f3       0x23 ./ra/fsp/src/bsp/mcu/all/bsp_io.o
+ .debug_str     0x0000d6bc       0x23 ./ra/fsp/src/bsp/mcu/all/bsp_io.o
                                 0x1ef (size before relaxing)
- .debug_str     0x0000d716      0x2d9 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
+ .debug_str     0x0000d6df      0x2d9 ./ra/fsp/src/bsp/mcu/all/bsp_irq.o
                                0x1e58 (size before relaxing)
- .debug_str     0x0000d9ef       0x88 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
+ .debug_str     0x0000d9b8       0x88 ./ra/fsp/src/bsp/mcu/all/bsp_register_protection.o
                                0x189b (size before relaxing)
- .debug_str     0x0000da77      0x14b ./ra/fsp/src/bsp/mcu/all/bsp_rom_registers.o
+ .debug_str     0x0000da40      0x14b ./ra/fsp/src/bsp/mcu/all/bsp_rom_registers.o
                                 0x2ff (size before relaxing)
- .debug_str     0x0000dbc2       0x96 ./ra/fsp/src/bsp/mcu/all/bsp_sbrk.o
+ .debug_str     0x0000db8b       0x96 ./ra/fsp/src/bsp/mcu/all/bsp_sbrk.o
                                 0x250 (size before relaxing)
- .debug_str     0x0000dc58       0x89 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
+ .debug_str     0x0000dc21       0x89 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/startup.o
                                 0x240 (size before relaxing)
- .debug_str     0x0000dce1      0x237 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
+ .debug_str     0x0000dcaa      0x237 ./ra/fsp/src/bsp/cmsis/Device/RENESAS/Source/system.o
                                 0x614 (size before relaxing)
 
 .debug_frame    0x00000000     0x1b70

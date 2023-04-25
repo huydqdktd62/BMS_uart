@@ -82,4 +82,5 @@ src/service/modbus/port \
 src/service/modbus/rtu \
 src/service/soc_ukf \
 src/test \
+src/service/retaget \
 
