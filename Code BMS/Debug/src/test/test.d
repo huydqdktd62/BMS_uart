@@ -56,6 +56,10 @@ src/test/test.o: ../src/test/test.c \
  D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\ra\fsp\inc\api/r_can_api.h \
  D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\src\service\fifo/fifo.h \
  D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\src/service/soc_ukf/soc_ukf.h \
+ D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\src\service\math/math_util.h \
+ D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\src\service\math/matrix.h \
+ d:\damquochuy\bp\bp_testing\tool\bms_uart\code\ bms\src\service\soc_ukf\battery_model.h \
+ d:\damquochuy\bp\bp_testing\tool\bms_uart\code\ bms\src\service\soc_ukf\soc_vffrls.h \
  D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\src/service/soc_ukf/battery_model.h
 D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\ra_gen/hal_data.h:
 D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\ra\fsp\inc\api/bsp_api.h:
@@ -114,4 +118,8 @@ D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\ra_cfg\fsp_cfg/r_can_cfg.h:
 D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\ra\fsp\inc\api/r_can_api.h:
 D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\src\service\fifo/fifo.h:
 D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\src/service/soc_ukf/soc_ukf.h:
+D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\src\service\math/math_util.h:
+D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\src\service\math/matrix.h:
+d:\damquochuy\bp\bp_testing\tool\bms_uart\code\ bms\src\service\soc_ukf\battery_model.h:
+d:\damquochuy\bp\bp_testing\tool\bms_uart\code\ bms\src\service\soc_ukf\soc_vffrls.h:
 D:\DamQuocHuy\BP\BP_Testing\Tool\BMS_uart\Code\ BMS\src/service/soc_ukf/battery_model.h:

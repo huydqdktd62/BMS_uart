@@ -35,24 +35,22 @@ SOC_Output soc_output;
 
 static float eta;
 
-static float m_weight[SIGMA_FACTOR] = { 	-599.0f,
-									100.0f,
-									100.0f,
-									100.0f,
-									100.0f,
-									100.0f,
-									100.0f };
-
-const Matrix m_weight_matrix = { .row = SIGMA_FACTOR, .col = 1, .entries =
+static float m_weight[SIGMA_FACTOR] = { 	-2999.0f,
+									500.0f,
+									500.0f,
+									500.0f,
+									500.0f,
+									500.0f,
+									500.0f };
+static Matrix m_weight_matrix = { .row = SIGMA_FACTOR, .col = 1, .entries =
 		&m_weight[0] };
-
-static const float c_weight[SIGMA_FACTOR] = { 	-599.0f - 3.0f - 0.0002f,
-									100.0f,
-									100.0f,
-									100.0f,
-									100.0f,
-									100.0f,
-									100.0f };
+static const float c_weight[SIGMA_FACTOR] = { 	-2999.0f - 3.0f - 0.0002f,
+									500.0f,
+									500.0f,
+									500.0f,
+									500.0f,
+									500.0f,
+									500.0f };
 
 static const float default_state_covariance[STATE_DIM * STATE_DIM] = {
 		0.001f, 0.0f, 0.0f,
@@ -232,8 +230,6 @@ static inline SOC_State soc_get_state(const SOC_UKF *const soc);
 /* USER CODE BEGIN PFP */
 
 void soc_set_state(SOC_UKF* soc, const SOC_State soc_state){
-	//TODO: add the average voltage and current feature
-	//TODO: add the transaction feature
 	soc->state = soc_state;
 }
 static inline SOC_State soc_get_state(const SOC_UKF *const soc){
@@ -253,10 +249,10 @@ void ukf_init(const uint32_t pack_voltage, const int32_t pack_current) {
 }
 
 void check_calib_condition(const SOC_Input input){
-	if (absolute_f((float) input.pack_current) < 25.0f) {
+	if (absolute_f((float) input.pack_current) < 60.0f) {
 		soc_sleep_cnt_10ms++;
 	}
-	if (absolute_f((float) input.pack_current) > 25.0f) {
+	if (absolute_f((float) input.pack_current) > 60.0f) {
 		soc_sleep_cnt_10ms = 0;
 	}
 	if (soc_sleep_cnt_10ms == CNT_3_MINUTE_10mS) {
@@ -324,7 +320,7 @@ uint8_t ukf_update(const SOC_Input input, const float soh) {
 		soc_set_state(&bms_soc, SOC_ST_SLEEP);
 		break;
 	case SOC_ST_SLEEP:
-		if (absolute_f((float) input.pack_current) > 25.0f) {
+		if (absolute_f((float) input.pack_current) > 55.0f) {
 			soc_set_state(&bms_soc, SOC_ST_IDLE);
 		}
 		break;
@@ -400,7 +396,7 @@ void soc_update_ukf(const SOC_UKF p_soc, const float soh){
 
 	uint8_t i,j;
 //	aukf_time_update_predict_state();
-	/*
+
 
 	for (i = 0; i < STATE_DIM; i++) {
 		priori_est_state.entries[i] = 0.0f;
@@ -416,9 +412,9 @@ void soc_update_ukf(const SOC_UKF p_soc, const float soh){
 		priori_est_state.entries[2] += m_weight[i]
 				* sigma_points.entries[2 * SIGMA_FACTOR + i];
 	}
-	*/
 
-	multiply(sigma_points, m_weight_matrix, priori_est_state);
+
+//	multiply(sigma_points, m_weight_matrix, priori_est_state);
 
 //	aukf_time_update_sigmaStateError();
 	hgenerate(priori_est_state, SIGMA_FACTOR, sigma_state_err);
@@ -528,9 +524,10 @@ void soc_update_ukf(const SOC_UKF p_soc, const float soh){
 		cross_cov.entries[i] = 0;
 	}
 	for (i = 0; i < SIGMA_FACTOR; i++) {
-		for (j = 0; j < STATE_DIM; j++)
+		for (j = 0; j < STATE_DIM; j++){
 			m1_update_cross_cov.entries[j] = sigma_state_err.entries[j
 					* SIGMA_FACTOR + i];
+		}
 		scalar_multiply(m1_update_cross_cov,
 				(c_weight[i] * sigma_measurement_err.entries[i]),
 				m1_update_cross_cov);
@@ -562,9 +559,9 @@ void soc_update_ukf(const SOC_UKF p_soc, const float soh){
 
 
 //	aukf_update_state_covariance();
-	for (i = 0; i < STATE_DIM; i++)
+	for (i = 0; i < STATE_DIM; i++){
 		t_update_state_cov.entries[i] = kalman_gain.entries[i];
-
+	}
 	multiply(kalman_gain, t_update_state_cov,
 			m_update_state_cov);
 	scalar_multiply(m_update_state_cov, measurement_cov,
