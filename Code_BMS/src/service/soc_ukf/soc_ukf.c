@@ -27,22 +27,22 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 
-static float m_weight[UKF_SIGMA_FACTOR] = { 	-2999.0f,
-									500.0f,
-									500.0f,
-									500.0f,
-									500.0f,
-									500.0f,
-									500.0f };
+static const int64_t m_weight[UKF_SIGMA_FACTOR] = { 	-2999,
+									500,
+									500,
+									500,
+									500,
+									500,
+									500 };
 static Matrix m_weight_matrix = { .row = UKF_SIGMA_FACTOR, .col = 1, .entries =
 		&m_weight[0] };
-static const float c_weight[UKF_SIGMA_FACTOR] = { 	-2999.0f - 3.0f - 0.0002f,
-									500.0f,
-									500.0f,
-									500.0f,
-									500.0f,
-									500.0f,
-									500.0f };
+static const float c_weight[UKF_SIGMA_FACTOR] = { 	-3002,
+									500,
+									500,
+									500,
+									500,
+									500,
+									500 };
 
 static const float default_state_covariance[UKF_STATE_DIM * UKF_STATE_DIM] = {
 		0.001f, 0.0f, 0.0f,

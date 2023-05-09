@@ -119,7 +119,7 @@ all: Can2Mb.elf secondary-outputs
 Can2Mb.elf: $(OBJS) $(USER_OBJS) $(LINKER_SCRIPT)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GNU Arm Cross C Linker'
-	$(file > Can2Mb.elf.in,-mcpu=cortex-m33 -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 -O2 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal  -g -gdwarf-4 -T "fsp.ld" -Xlinker --gc-sections -L "D:\\DamQuocHuy\\BP\\BP_Testing\\Tool\\BMS_uart\\Code BMS/script" -Wl,-Map,"Can2Mb.map" --specs=nano.specs --specs=rdimon.specs -o "Can2Mb.elf" -Wl,--start-group $(OBJS) $(USER_OBJS) $(LIBS) -Wl,--end-group)
+	$(file > Can2Mb.elf.in,-mcpu=cortex-m33 -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 -O2 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -Wunused -Wuninitialized -Wall -Wextra -Wmissing-declarations -Wconversion -Wpointer-arith -Wshadow -Wlogical-op -Waggregate-return -Wfloat-equal  -g -gdwarf-4 -T "fsp.ld" -Xlinker --gc-sections -L "D:\\DamQuocHuy\\BP\\BP_Testing\\Tool\\BMS_uart\\Code_BMS/script" -Wl,-Map,"Can2Mb.map" --specs=nano.specs --specs=rdimon.specs -o "Can2Mb.elf" -Wl,--start-group $(OBJS) $(USER_OBJS) $(LIBS) -Wl,--end-group)
 	arm-none-eabi-gcc @"Can2Mb.elf.in"
 	@echo 'Finished building target: $@'
 	@echo ' '
