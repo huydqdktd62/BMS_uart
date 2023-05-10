@@ -160,8 +160,8 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1900880215.603581625" name="test.c" rcbsApplicability="disable" resourcePath="src/test/test.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433.2088125279">
-						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433.2088125279" name="GNU Arm Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433"/>
+					<fileInfo id="com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1900880215.1632058342" name="test.c" rcbsApplicability="disable" resourcePath="src/test/test.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433.1721174399">
+						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433.1721174399" name="GNU Arm Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433"/>
 					</fileInfo>
 					<folderInfo id="com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1900880215.1599599568" name="/" resourcePath="src/board/uart">
 						<toolChain id="com.renesas.cdt.managedbuild.gnuarm.toolchain.elf.debug.2115113258" name="GCC ARM Embedded" superClass="com.renesas.cdt.managedbuild.gnuarm.toolchain.elf.debug" unusedChildren="">
@@ -264,7 +264,7 @@
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra_gen"/>
-						<entry excluding="test/test_normalized.c|board/uart|hal_entry.c|service/canopen/test|service/canopen/example|service/modbus/tcp|service/modbus/ascii" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="test/test.c|board/uart|hal_entry.c|service/canopen/test|service/canopen/example|service/modbus/tcp|service/modbus/ascii" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

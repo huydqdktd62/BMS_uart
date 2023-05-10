@@ -63,20 +63,149 @@ int32_t load_battery_data_from_csv_file(const char* path,BMS_Input_Vector *buff,
     if(NULL==stream){
     	return -1;
     }
+    int i;
     uint32_t line_id=0;
-    char line[1024];
+    int32_t index;
+    char line[2048];
     const char* field;
-    while (fgets(line, 1024, stream))
-    {
-        char* tmp;
+	while (fgets(line, 2048, stream)) {
+		index = 1;
+		char *tmp;
 
-        for (int i = 1; i < 22; i++){
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].data_logger.pack_voltage= (int32_t)atof(field);
+        free(tmp);
+
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].data_logger.pack_current= (int32_t)atof(field);
+        free(tmp);
+
+        for (i = 0; i < UKF_STATE_DIM; i++){
             tmp = strdup(line);
-            field=getfield(tmp, i);
+            field=getfield(tmp, index++);
             if(NULL==field) return -1;
-            buff[line_id].sigma_point[i-1]= (int64_t)atof(field);
+            buff[line_id].data_logger.estimate_state[i]= (int32_t)atof(field);
             free(tmp);
         }
+
+        for (i = 0; i < UKF_STATE_DIM*UKF_STATE_DIM; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.state_covariance[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
+        for (i = 0; i < UKF_STATE_DIM*UKF_SIGMA_FACTOR; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.sigma_points[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
+        for (i = 0; i < UKF_STATE_DIM; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.priori_estimate_state[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
+        for (i = 0; i < UKF_STATE_DIM*UKF_SIGMA_FACTOR; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.sigma_state_error[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].data_logger.measurement_cov= (int32_t)atof(field);
+        free(tmp);
+
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].data_logger.est_measurement= (int32_t)atof(field);
+        free(tmp);
+
+        for (i = 0; i < UKF_STATE_DIM; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.cross_covariance[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
+        for (i = 0; i < UKF_STATE_DIM; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.aukf_kalman_gain[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
+        for (i = 0; i < UKF_STATE_DIM*UKF_STATE_DIM; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.matrix_A[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+        for (i = 0; i < UKF_STATE_DIM*UKF_DYNAMIC_DIM; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.matrix_B[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+        for (i = 0; i < UKF_STATE_DIM; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.matrix_C[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
+        for (i = 0; i < UKF_DYNAMIC_DIM; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.matrix_D[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
+        for (i = 0; i < UKF_DYNAMIC_DIM; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.observed_measurement[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
+        for (i = 0; i < UKF_SIGMA_FACTOR; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.sigma_measurements[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
+        for (i = 0; i < UKF_SIGMA_FACTOR; i++){
+            tmp = strdup(line);
+            field=getfield(tmp, index++);
+            if(NULL==field) return -1;
+            buff[line_id].data_logger.sigma_measurement_error[i]= (int32_t)atof(field);
+            free(tmp);
+        }
+
 
     	line_id++;
     	if(line_id >= max_size){

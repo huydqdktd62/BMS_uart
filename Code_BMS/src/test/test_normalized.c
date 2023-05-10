@@ -129,7 +129,7 @@ void process_handle(char* buff,uint32_t len){
     uint16_t k;
     string_split(buff,",",buff_soc);
     for(i = 0; i < 21; i++){
-        input.sigma_point[i] = (int64_t)atof(buff_soc[i]);
+        input.sigma_point[i] = (int64_t)atoi(buff_soc[i]);
     }
     for(i = 0; i < 3; i++){
         summation[i] = 0;
@@ -151,44 +151,10 @@ void process_handle(char* buff,uint32_t len){
     for (i = 0; i < 3; i++){
         uart_print("%d,", (int32_t)summation[i]);
     }
+    for (i = 0; i < 3; i++){
+        uart_print("%.6f,", result[i]);
+    }
     uart_print ("\n");
-
-//    uart_print("%d,%d,%d,%d,",soc_output.SOC,(int32_t)(soc_output.SOC_f*1000000000.0f),input.pack_voltage,input.pack_current);
-//    uart_print("%d,%d,",(int32_t)(RC_param*1000000000.0f), (int32_t)(H_param*1000000000.0f));
-//    int i;
-//    for (i = 0; i < 3; i++)
-//        uart_print("%d,", (int32_t)(estimate_state_entries[i]*1000000000.0f));
-//    for (i = 0; i < 9; i++)
-//        uart_print("%d,", (int32_t)(state_covariance_entries[i]*1000000000.0f));
-//    for (i = 0; i < 21; i++)
-//        uart_print( "%d,", (int32_t)(sigma_points_entries[i]*1000000000.0f));
-//    uart_print( "%d,%d,%d,", (int32_t)(priori_estimate_state_entries[0]*1000000000.0f),
-//            (int32_t)(priori_estimate_state_entries[1]*1000000000.0f),
-//            (int32_t)(priori_estimate_state_entries[2]*1000000000.0f));
-//    for (i = 0; i < 21; i++)
-//        uart_print( "%d,", (int32_t)(sigma_state_error_entries[i]*1000000000.0f));
-//    uart_print( "%d,%d,", (int32_t)(measurement_cov*1000000000.0f),
-//            (int32_t)(est_measurement*1000000.0f));
-//    for (i = 0; i < 3; i++)
-//        uart_print( "%d,", (int32_t)(cross_covariance_entries[i]*1000000000.0f));
-//    for (i = 0; i < 3; i++)
-//        uart_print( "%d,", (int32_t)(aukf_kalman_gain_entries[i]*1000000000.0f));
-//    for (i = 0; i < 9; i++)
-//        uart_print( "%d,", (int32_t)(matrix_A_entries[i]*1000000000.0f));
-//    for (i = 0; i < 6; i++)
-//        uart_print( "%d,", (int32_t)(matrix_B_entries[i]*1000000000.0f));
-//    for (i = 0; i < 3; i++)
-//        uart_print( "%d,", (int32_t)(matrix_C_entries[i]*1000000.0f));
-//    for (i = 0; i < 2; i++)
-//        uart_print( "%d,", (int32_t)(matrix_D_entries[i]*1000000000.0f));
-//    uart_print( "%d,%d,", (int32_t)(observed_measurement_entries[0]*1000000000.0f),
-//            (int32_t)(observed_measurement_entries[1]*1000000000.0f));
-//    for (i = 0; i < 7; i++)
-//        uart_print( "%d,", (int32_t)(sigma_measurements_entries[i]*1000000000.0f));
-//    for (i = 0; i < 7; i++)
-//        uart_print( "%d,", (int32_t)(sigma_measurement_error_entries[i]*1000000000.0f));
-//    uart_print("\n");
-
 }
 
 char buff_tx[1024];

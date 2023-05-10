@@ -57,7 +57,6 @@ static const float default_system_covariance[UKF_STATE_DIM * UKF_STATE_DIM] = {
 };
 
 Battery_param battery_param;
-SOC_Parameter_Entries soc_entries;
 static uint32_t soc_update_cnt_10ms = 1;
 static uint32_t soc_sleep_cnt_10ms = 0;
 
@@ -68,7 +67,6 @@ static uint32_t soc_sleep_cnt_10ms = 0;
 
 static void filter_init(const uint32_t pack_voltage, const int32_t pack_current,
 		SOC_UKF *battery_soc);
-static void parameters_init(SOC_UKF* battery_soc);
 static void entries_init(SOC_UKF* battery_soc, const float soh);
 static void output_init(SOC_UKF* battery_soc);
 static void check_calib_condition(SOC_UKF* battery_soc);
@@ -87,7 +85,7 @@ void ukf_init(const uint32_t pack_voltage, const int32_t pack_current, SOC_UKF* 
 	battery_soc->input.pack_voltage = pack_voltage;
 	battery_soc->input.pack_current = pack_current;
 	filter_init(pack_voltage, pack_current, battery_soc);
-	parameters_init(battery_soc);
+	entries_init(battery_soc, 1.0f);
 	output_init(battery_soc);
 	battery_soc->err = SOC_SUCCESS;
 	soc_set_state(battery_soc, SOC_ST_INIT);
@@ -185,7 +183,7 @@ static void filter_init(const uint32_t pack_voltage, const int32_t pack_current,
 	battery_soc->filter.avg_cnt = 0;
 }
 
-static void parameters_init(SOC_UKF* battery_soc){
+void parameters_init(SOC_UKF* battery_soc, SOC_Parameter_Entries soc_entries){
 	battery_soc->param.est_state.row = UKF_STATE_DIM;
 	battery_soc->param.est_state.col = UKF_SINGLE_DIM;
 	battery_soc->param.est_state.entries = &soc_entries.estimate_state_entries[0];
@@ -322,7 +320,7 @@ static void entries_init(SOC_UKF* battery_soc, __attribute__((unused)) const flo
 		battery_soc->param.matrix_B.entries[i] = ZERO;
 	}
 
-	battery_soc->param.matrix_B.entries[0] = (float)(UKF_DISCHARGE_ETA_RATIO * UKF_SAMPLE_TIME_s / UKF_NOMIMAL_CAPACITY_AS);
+	battery_soc->param.matrix_B.entries[0] = -(float)(UKF_DISCHARGE_ETA_RATIO * UKF_SAMPLE_TIME_s / UKF_NOMIMAL_CAPACITY_AS);
 	battery_soc->param.matrix_B.entries[2] = UKF_UNIT_F - exponent_f((float)(-UKF_SAMPLE_TIME_s / (UKF_R1_INIT_Omh * UKF_C1_INIT_F)));
 
 	for (i = 0; i < UKF_MEASUREMENT_DIM * UKF_STATE_DIM; i++){

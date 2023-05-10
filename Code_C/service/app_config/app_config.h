@@ -8,7 +8,10 @@
 #ifndef SERVICE_APP_CONFIG_APP_CONFIG_H_
 #define SERVICE_APP_CONFIG_APP_CONFIG_H_
 
-#define TEST_SOC					1
+#include "data_logger.h"
+
+#define TEST_SOC					0
+#define NORMALIZED_TYPE				SIGMA_POINT
 
 
 

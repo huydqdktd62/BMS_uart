@@ -8,6 +8,7 @@
 #ifndef CSV_LOADER_H_
 #define CSV_LOADER_H_
 #include "app_config.h"
+#include "data_logger.h"
 
 #include "stdint.h"
 
@@ -20,7 +21,7 @@ struct BMS_Input_Vector_t{
 };
 #else
 struct BMS_Input_Vector_t{
-	int64_t sigma_point[21];
+	Data_Logger data_logger;
 };
 #endif
 
