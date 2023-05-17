@@ -11,7 +11,7 @@
 #include "data_logger.h"
 
 #define TEST_SOC					0
-#define NORMALIZED_TYPE				SIGMA_POINT
+#define NORMALIZED_TYPE				SIGMA_MEASUREMENT
 
 
 

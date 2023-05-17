@@ -25,6 +25,7 @@ static BMS_Input_Vector input_vector[INPUT_SAMPLE_SIZE];
 FILE *out_file;
 
 SOC_UKF bms_soc;
+SOC_Parameter_Entries soc_entries;
 uint32_t soc = 0.0f;
 float cell_vol = 0.0f;
 float cell_cur = 0.0f;
@@ -141,7 +142,8 @@ int hal_entry(void) {
 	cell_vol = input_vector[0].terminalVoltage;
 	cell_cur = input_vector[0].current;
 
-	load_soc(&bms_soc, get_soc_from_ocv((float)cell_vol/16000.0f));
+	load_soc(&bms_soc, get_soc_from_ocv((float)cell_vol/PACK_VOLTAGE_NORMALIZED_GAIN));
+	ukf_parameters_init(&bms_soc, &soc_entries);
 	ukf_init(cell_vol, cell_cur, &bms_soc);
 
 	for (int i = 1; i < sample_size; i++) {

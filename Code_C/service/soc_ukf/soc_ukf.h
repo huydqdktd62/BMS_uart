@@ -44,7 +44,8 @@ enum SOC_State_t {
 
 typedef enum SOC_err_t SOC_err;
 enum SOC_err_t {
-	SOC_SUCCESS = 0, SOC_FAIL
+	SOC_SUCCESS = 0,
+	SOC_FAIL
 };
 
 typedef struct SOC_Filter_t SOC_Filter;
@@ -138,7 +139,7 @@ struct SOC_UKF_t {
 void load_soc(SOC_UKF *battery_soc, const float soc);
 void ukf_init(const uint32_t pack_voltage, const int32_t pack_current,
 		SOC_UKF *battery_soc);
-void parameters_init(SOC_UKF* battery_soc, SOC_Parameter_Entries soc_entries);
+void ukf_parameters_init(SOC_UKF* battery_soc, SOC_Parameter_Entries* soc_entries);
 uint8_t ukf_update(SOC_UKF *battery_soc, const float soh);
 
 extern SOC_Parameter_Entries soc_entries;

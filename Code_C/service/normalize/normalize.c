@@ -7,8 +7,10 @@
 
 #include "normalize.h"
 
-void synchronize_matrix(const int32_t* entry, Matrix* dst);
-void synchronize_entry(const Matrix* matrix, int32_t* dst);
+void synchronize_matrix_e6(const int32_t* entry, Matrix* dst);
+void synchronize_matrix_e9(const int32_t* entry, Matrix* dst);
+void synchronize_entry_e6(const Matrix* matrix, int32_t* dst);
+void synchronize_entry_e9(const Matrix* matrix, int32_t* dst);
 
 static float m_weight[UKF_SIGMA_FACTOR] = { 	-2999.0f,
 									500.0f,
@@ -34,34 +36,39 @@ static const float default_system_covariance[UKF_STATE_DIM * UKF_STATE_DIM] = {
 };
 
 void synchronize_in(const Data_Logger* input, SOC_UKF* logger){
-	synchronize_matrix(&input->estimate_state[0], &logger->param.est_state);
-	int32_t i;
-	for(i = 0; i < logger->param.state_cov.col * logger->param.state_cov.row; i++){
-		logger->param.state_cov.entries[i] = (float)input->state_covariance[i] / 1000000000000.0f;
-	}
-	synchronize_matrix(&input->sigma_points[0], &logger->param.sigma_points);
-	synchronize_matrix(&input->priori_estimate_state[0], &logger->param.priori_est_state);
-	synchronize_matrix(&input->matrix_A[0], &logger->param.matrix_A);
-	synchronize_matrix(&input->matrix_B[0], &logger->param.matrix_B);
-	synchronize_matrix(&input->matrix_C[0], &logger->param.matrix_C);
-	synchronize_matrix(&input->matrix_D[0], &logger->param.matrix_D);
-	synchronize_matrix(&input->sigma_state_error[0], &logger->param.sigma_state_err);
-	synchronize_matrix(&input->observed_measurement[0], &logger->param.observed_measurement);
-	synchronize_matrix(&input->sigma_measurements[0], &logger->param.sigma_measurements);
-	synchronize_matrix(&input->sigma_measurement_error[0], &logger->param.sigma_measurement_err);
-	synchronize_matrix(&input->cross_covariance[0], &logger->param.cross_cov);
-	synchronize_matrix(&input->aukf_kalman_gain[0], &logger->param.kalman_gain);
+	synchronize_matrix_e6(&input->estimate_state[0], &logger->param.est_state);
+	synchronize_matrix_e9(&input->state_covariance[0], &logger->param.state_cov);
+	synchronize_matrix_e6(&input->sigma_points[0], &logger->param.sigma_points);
+	synchronize_matrix_e6(&input->priori_estimate_state[0], &logger->param.priori_est_state);
+	synchronize_matrix_e6(&input->matrix_A[0], &logger->param.matrix_A);
+	synchronize_matrix_e6(&input->matrix_B[0], &logger->param.matrix_B);
+	synchronize_matrix_e6(&input->matrix_C[0], &logger->param.matrix_C);
+	synchronize_matrix_e6(&input->matrix_D[0], &logger->param.matrix_D);
+	synchronize_matrix_e6(&input->sigma_state_error[0], &logger->param.sigma_state_err);
+	synchronize_matrix_e6(&input->observed_measurement[0], &logger->param.observed_measurement);
+	synchronize_matrix_e6(&input->sigma_measurements[0], &logger->param.sigma_measurements);
+	synchronize_matrix_e6(&input->sigma_measurement_error[0], &logger->param.sigma_measurement_err);
+	synchronize_matrix_e9(&input->cross_covariance[0], &logger->param.cross_cov);
+	synchronize_matrix_e9(&input->aukf_kalman_gain[0], &logger->param.kalman_gain);
 	logger->param.est_measurement = (float)input->est_measurement / 1000000.0f;
 	logger->param.measurement_cov = (float)input->measurement_cov / 1000000.0f;
 	logger->param.cell_voltage = (float)input->pack_voltage / PACK_VOLTAGE_NORMALIZED_GAIN;
 	logger->param.cell_current = (float)input->pack_current / PACK_CURRENT_NORMALIZED_GAIN;
 
+
 }
 
-void synchronize_matrix(const int32_t* entry, Matrix* dst){
+void synchronize_matrix_e6(const int32_t* entry, Matrix* dst){
 	int32_t i;
 	for(i = 0; i < dst->col * dst->row; i++){
 		dst->entries[i] = (float)entry[i] / 1000000.0f;
+	}
+}
+
+void synchronize_matrix_e9(const int32_t* entry, Matrix* dst){
+	int32_t i;
+	for(i = 0; i < dst->col * dst->row; i++){
+		dst->entries[i] = (float)entry[i] / 1000000000.0f;
 	}
 }
 
@@ -298,29 +305,36 @@ int normalize(const SOC_UKF *logger, SOC_UKF *processor, const Parameter type) {
 }
 
 void synchronize_out(const SOC_UKF* processor, Data_Logger* output){
-	synchronize_entry(&processor->param.est_state, &output->estimate_state[0]);
-	synchronize_entry(&processor->param.state_cov, &output->state_covariance[0]);
-	synchronize_entry(&processor->param.sigma_points, &output->sigma_points[0]);
-	synchronize_entry(&processor->param.priori_est_state, &output->priori_estimate_state[0]);
-	synchronize_entry(&processor->param.matrix_A, &output->matrix_A[0]);
-	synchronize_entry(&processor->param.matrix_B, &output->matrix_B[0]);
-	synchronize_entry(&processor->param.matrix_C, &output->matrix_C[0]);
-	synchronize_entry(&processor->param.matrix_D, &output->matrix_D[0]);
-	synchronize_entry(&processor->param.sigma_state_err, &output->sigma_state_error[0]);
-	synchronize_entry(&processor->param.observed_measurement, &output->observed_measurement[0]);
-	synchronize_entry(&processor->param.sigma_measurements, &output->sigma_measurements[0]);
-	synchronize_entry(&processor->param.sigma_measurement_err, &output->sigma_measurement_error[0]);
-	synchronize_entry(&processor->param.cross_cov, &output->cross_covariance[0]);
-	synchronize_entry(&processor->param.kalman_gain, &output->aukf_kalman_gain[0]);
+	synchronize_entry_e6(&processor->param.est_state, &output->estimate_state[0]);
+	synchronize_entry_e9(&processor->param.state_cov, &output->state_covariance[0]);
+	synchronize_entry_e6(&processor->param.sigma_points, &output->sigma_points[0]);
+	synchronize_entry_e6(&processor->param.priori_est_state, &output->priori_estimate_state[0]);
+	synchronize_entry_e6(&processor->param.matrix_A, &output->matrix_A[0]);
+	synchronize_entry_e6(&processor->param.matrix_B, &output->matrix_B[0]);
+	synchronize_entry_e6(&processor->param.matrix_C, &output->matrix_C[0]);
+	synchronize_entry_e6(&processor->param.matrix_D, &output->matrix_D[0]);
+	synchronize_entry_e6(&processor->param.sigma_state_err, &output->sigma_state_error[0]);
+	synchronize_entry_e6(&processor->param.observed_measurement, &output->observed_measurement[0]);
+	synchronize_entry_e6(&processor->param.sigma_measurements, &output->sigma_measurements[0]);
+	synchronize_entry_e6(&processor->param.sigma_measurement_err, &output->sigma_measurement_error[0]);
+	synchronize_entry_e9(&processor->param.cross_cov, &output->cross_covariance[0]);
+	synchronize_entry_e9(&processor->param.kalman_gain, &output->aukf_kalman_gain[0]);
 	output->est_measurement = (int32_t)(processor->param.est_measurement * 1000000.0f);
 	output->measurement_cov = (int32_t)(processor->param.measurement_cov * 1000000.0f);
 	output->pack_voltage = (int32_t)(processor->param.cell_voltage * PACK_VOLTAGE_NORMALIZED_GAIN);
 	output->pack_current = (int32_t)(processor->param.cell_current * PACK_CURRENT_NORMALIZED_GAIN);
 }
 
-void synchronize_entry(const Matrix* matrix, int32_t* dst){
+void synchronize_entry_e6(const Matrix* matrix, int32_t* dst){
 	int32_t i;
 	for(i = 0; i < matrix->col * matrix->row; i++){
-		matrix->entries[i] = (int32_t)(dst[i] * 1000000.0f);
+		dst[i] = (int32_t)(matrix->entries[i] * 1000000.0f);
+	}
+}
+
+void synchronize_entry_e9(const Matrix* matrix, int32_t* dst){
+	int32_t i;
+	for(i = 0; i < matrix->col * matrix->row; i++){
+		dst[i] = (int32_t)(matrix->entries[i] * 1000000000.0f);
 	}
 }

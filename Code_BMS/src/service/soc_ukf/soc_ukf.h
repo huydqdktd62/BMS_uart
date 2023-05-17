@@ -16,13 +16,13 @@
 #include "../soc_ukf/soc_vffrls.h"
 
 typedef struct SOC_Input_t SOC_Input;
-struct SOC_Input_t{
+struct SOC_Input_t {
 	uint32_t pack_voltage;
 	int32_t pack_current;
 };
 
 typedef struct SOC_Output_t SOC_Output;
-struct SOC_Output_t{
+struct SOC_Output_t {
 	uint32_t SOC;
 	float OCV;
 	float R0;
@@ -32,7 +32,7 @@ struct SOC_Output_t{
 };
 
 typedef enum SOC_State_t SOC_State;
-enum SOC_State_t{
+enum SOC_State_t {
 	SOC_ST_INIT = 0,
 	SOC_ST_IDLE,
 	SOC_ST_UKF,
@@ -42,15 +42,14 @@ enum SOC_State_t{
 	SOC_ST_FAULT
 };
 
-
 typedef enum SOC_err_t SOC_err;
-enum SOC_err_t{
+enum SOC_err_t {
 	SOC_SUCCESS = 0,
 	SOC_FAIL
 };
 
 typedef struct SOC_Filter_t SOC_Filter;
-struct SOC_Filter_t{
+struct SOC_Filter_t {
 	uint32_t total_pack_voltage;
 	int32_t total_pack_current;
 	uint32_t avg_pack_voltage;
@@ -59,7 +58,7 @@ struct SOC_Filter_t{
 };
 
 typedef struct SOC_parameter_t SOC_parameter;
-struct SOC_parameter_t{
+struct SOC_parameter_t {
 	Matrix est_state;
 	Matrix state_cov;
 	Matrix sigma_points;
@@ -128,7 +127,7 @@ struct SOC_Parameter_Entries_t{
 };
 
 typedef struct SOC_UKF_t SOC_UKF;
-struct SOC_UKF_t{
+struct SOC_UKF_t {
 	SOC_Input input;
 	SOC_Output output;
 	SOC_State state;
@@ -137,9 +136,11 @@ struct SOC_UKF_t{
 	SOC_err err;
 };
 
-void load_soc(SOC_UKF* battery_soc, const float soc);
-void ukf_init(const uint32_t pack_voltage, const int32_t pack_current, SOC_UKF* battery_soc);
-uint8_t ukf_update(SOC_UKF* battery_soc, const float soh);
+void load_soc(SOC_UKF *battery_soc, const float soc);
+void ukf_init(const uint32_t pack_voltage, const int32_t pack_current,
+		SOC_UKF *battery_soc);
+void ukf_parameters_init(SOC_UKF* battery_soc, SOC_Parameter_Entries* soc_entries);
+uint8_t ukf_update(SOC_UKF *battery_soc, const float soh);
 
 extern SOC_Parameter_Entries soc_entries;
 extern SOC_UKF bms_soc;

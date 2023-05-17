@@ -73,16 +73,4 @@
 #define UKF_SLEEP_CURRENT_THRESHOLD					(55.0f)
 #define UKF_CALIB_CURRENT_THRESHOLD					(60.0f)
 
-
-
-
-
-
-
-
-
-
-
-
-
 #endif /* SERVICE_SOC_UKF_REFACTOR_SOC_UKF_CONFIG_H_ */

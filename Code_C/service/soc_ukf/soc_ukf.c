@@ -183,114 +183,114 @@ static void filter_init(const uint32_t pack_voltage, const int32_t pack_current,
 	battery_soc->filter.avg_cnt = 0;
 }
 
-void parameters_init(SOC_UKF* battery_soc, SOC_Parameter_Entries soc_entries){
+void ukf_parameters_init(SOC_UKF* battery_soc, SOC_Parameter_Entries* soc_entries){
 	battery_soc->param.est_state.row = UKF_STATE_DIM;
 	battery_soc->param.est_state.col = UKF_SINGLE_DIM;
-	battery_soc->param.est_state.entries = &soc_entries.estimate_state_entries[0];
+	battery_soc->param.est_state.entries = &soc_entries->estimate_state_entries[0];
 
 	battery_soc->param.state_cov.row = UKF_STATE_DIM;
 	battery_soc->param.state_cov.col = UKF_STATE_DIM;
-	battery_soc->param.state_cov.entries = &soc_entries.state_covariance_entries[0];
+	battery_soc->param.state_cov.entries = &soc_entries->state_covariance_entries[0];
 
 	battery_soc->param.sigma_points.row = UKF_STATE_DIM;
 	battery_soc->param.sigma_points.col = UKF_SIGMA_FACTOR;
-	battery_soc->param.sigma_points.entries = &soc_entries.sigma_points_entries[0];
+	battery_soc->param.sigma_points.entries = &soc_entries->sigma_points_entries[0];
 
 	battery_soc->param.priori_est_state.row = UKF_STATE_DIM;
 	battery_soc->param.priori_est_state.col = UKF_SINGLE_DIM;
-	battery_soc->param.priori_est_state.entries = &soc_entries.priori_estimate_state_entries[0];
+	battery_soc->param.priori_est_state.entries = &soc_entries->priori_estimate_state_entries[0];
 
 	battery_soc->param.matrix_A.row = UKF_STATE_DIM;
 	battery_soc->param.matrix_A.col = UKF_STATE_DIM;
-	battery_soc->param.matrix_A.entries = &soc_entries.matrix_A_entries[0];
+	battery_soc->param.matrix_A.entries = &soc_entries->matrix_A_entries[0];
 
 	battery_soc->param.matrix_B.row = UKF_STATE_DIM;
 	battery_soc->param.matrix_B.col = UKF_DYNAMIC_DIM;
-	battery_soc->param.matrix_B.entries = &soc_entries.matrix_B_entries[0];
+	battery_soc->param.matrix_B.entries = &soc_entries->matrix_B_entries[0];
 
 	battery_soc->param.matrix_C.row = UKF_MEASUREMENT_DIM;
 	battery_soc->param.matrix_C.col = UKF_STATE_DIM;
-	battery_soc->param.matrix_C.entries = &soc_entries.matrix_C_entries[0];
+	battery_soc->param.matrix_C.entries = &soc_entries->matrix_C_entries[0];
 
 	battery_soc->param.matrix_D.row = UKF_MEASUREMENT_DIM;
 	battery_soc->param.matrix_D.col = UKF_DYNAMIC_DIM;
-	battery_soc->param.matrix_D.entries = &soc_entries.matrix_D_entries[0];
+	battery_soc->param.matrix_D.entries = &soc_entries->matrix_D_entries[0];
 
 	battery_soc->param.sigma_state_err.row = UKF_STATE_DIM;
 	battery_soc->param.sigma_state_err.col = UKF_SIGMA_FACTOR;
-	battery_soc->param.sigma_state_err.entries = &soc_entries.sigma_state_error_entries[0];
+	battery_soc->param.sigma_state_err.entries = &soc_entries->sigma_state_error_entries[0];
 
 	battery_soc->param.observed_measurement.row = UKF_DYNAMIC_DIM;
 	battery_soc->param.observed_measurement.col = UKF_SINGLE_DIM;
-	battery_soc->param.observed_measurement.entries = &soc_entries.observed_measurement_entries[0];
+	battery_soc->param.observed_measurement.entries = &soc_entries->observed_measurement_entries[0];
 
 	battery_soc->param.sigma_measurements.row = UKF_MEASUREMENT_DIM;
 	battery_soc->param.sigma_measurements.col = UKF_SIGMA_FACTOR;
-	battery_soc->param.sigma_measurements.entries = &soc_entries.sigma_measurements_entries[0];
+	battery_soc->param.sigma_measurements.entries = &soc_entries->sigma_measurements_entries[0];
 
 	battery_soc->param.sigma_measurement_err.row = UKF_MEASUREMENT_DIM;
 	battery_soc->param.sigma_measurement_err.col = UKF_SIGMA_FACTOR;
-	battery_soc->param.sigma_measurement_err.entries = &soc_entries.sigma_measurement_error_entries[0];
+	battery_soc->param.sigma_measurement_err.entries = &soc_entries->sigma_measurement_error_entries[0];
 
 	battery_soc->param.cross_cov.row = UKF_STATE_DIM;
 	battery_soc->param.cross_cov.col = UKF_MEASUREMENT_DIM;
-	battery_soc->param.cross_cov.entries = &soc_entries.cross_covariance_entries[0];
+	battery_soc->param.cross_cov.entries = &soc_entries->cross_covariance_entries[0];
 
 	battery_soc->param.kalman_gain.row = UKF_STATE_DIM;
 	battery_soc->param.kalman_gain.col = UKF_SINGLE_DIM;
-	battery_soc->param.kalman_gain.entries = &soc_entries.aukf_kalman_gain_entries[0];
+	battery_soc->param.kalman_gain.entries = &soc_entries->aukf_kalman_gain_entries[0];
 
 	battery_soc->param.g1_create_sigma_point.row = UKF_STATE_DIM;
 	battery_soc->param.g1_create_sigma_point.col = UKF_STATE_DIM;
-	battery_soc->param.g1_create_sigma_point.entries = &soc_entries.g1_create_sigma_point_entries[0];
+	battery_soc->param.g1_create_sigma_point.entries = &soc_entries->g1_create_sigma_point_entries[0];
 
 	battery_soc->param.g2_create_sigma_point.row = UKF_STATE_DIM;
 	battery_soc->param.g2_create_sigma_point.col = UKF_STATE_DIM;
-	battery_soc->param.g2_create_sigma_point.entries = &soc_entries.g2_create_sigma_point_entries[0];
+	battery_soc->param.g2_create_sigma_point.entries = &soc_entries->g2_create_sigma_point_entries[0];
 
 	battery_soc->param.m_update_sigma_state.row = UKF_STATE_DIM;
 	battery_soc->param.m_update_sigma_state.col = UKF_SINGLE_DIM;
-	battery_soc->param.m_update_sigma_state.entries = &soc_entries.m_update_sigma_state_entries[0];
+	battery_soc->param.m_update_sigma_state.entries = &soc_entries->m_update_sigma_state_entries[0];
 
 	battery_soc->param.g_update_sigma_state.row = UKF_STATE_DIM;
 	battery_soc->param.g_update_sigma_state.col = UKF_SIGMA_FACTOR;
-	battery_soc->param.g_update_sigma_state.entries = &soc_entries.g_update_sigma_state_entries[0];
+	battery_soc->param.g_update_sigma_state.entries = &soc_entries->g_update_sigma_state_entries[0];
 
 	battery_soc->param.m1_update_state_cov.row = UKF_STATE_DIM;
 	battery_soc->param.m1_update_state_cov.col = UKF_SINGLE_DIM;
-	battery_soc->param.m1_update_state_cov.entries = &soc_entries.m1_time_update_state_covariance_entries[0];
+	battery_soc->param.m1_update_state_cov.entries = &soc_entries->m1_time_update_state_covariance_entries[0];
 
 	battery_soc->param.m2_update_state_cov.row = UKF_SINGLE_DIM;
 	battery_soc->param.m2_update_state_cov.col = UKF_STATE_DIM;
-	battery_soc->param.m2_update_state_cov.entries = &soc_entries.m2_time_update_state_covariance_entries[0];
+	battery_soc->param.m2_update_state_cov.entries = &soc_entries->m2_time_update_state_covariance_entries[0];
 
 	battery_soc->param.m3_update_state_cov.row = UKF_STATE_DIM;
 	battery_soc->param.m3_update_state_cov.col = UKF_STATE_DIM;
-	battery_soc->param.m3_update_state_cov.entries = &soc_entries.m3_time_update_state_covariance_entries[0];
+	battery_soc->param.m3_update_state_cov.entries = &soc_entries->m3_time_update_state_covariance_entries[0];
 
 	battery_soc->param.g_update_sigma_measurement.row = UKF_MEASUREMENT_DIM;
 	battery_soc->param.g_update_sigma_measurement.col = UKF_SIGMA_FACTOR;
-	battery_soc->param.g_update_sigma_measurement.entries = &soc_entries.g_update_sigma_measurement_entries[0];
+	battery_soc->param.g_update_sigma_measurement.entries = &soc_entries->g_update_sigma_measurement_entries[0];
 
 	battery_soc->param.g_update_measurement_cov.row = UKF_MEASUREMENT_DIM;
 	battery_soc->param.g_update_measurement_cov.col = UKF_SIGMA_FACTOR;
-	battery_soc->param.g_update_measurement_cov.entries = &soc_entries.g_update_measurement_covariance_entries[0];
+	battery_soc->param.g_update_measurement_cov.entries = &soc_entries->g_update_measurement_covariance_entries[0];
 
 	battery_soc->param.m1_update_cross_cov.row = UKF_STATE_DIM;
 	battery_soc->param.m1_update_cross_cov.col = UKF_SINGLE_DIM;
-	battery_soc->param.m1_update_cross_cov.entries = &soc_entries.m1_update_cross_covariance_entries[0];
+	battery_soc->param.m1_update_cross_cov.entries = &soc_entries->m1_update_cross_covariance_entries[0];
 
 	battery_soc->param.m_update_state.row = UKF_STATE_DIM;
 	battery_soc->param.m_update_state.col = UKF_SINGLE_DIM;
-	battery_soc->param.m_update_state.entries = &soc_entries.m_update_state_entries[0];
+	battery_soc->param.m_update_state.entries = &soc_entries->m_update_state_entries[0];
 
 	battery_soc->param.t_update_state_cov.row = UKF_SINGLE_DIM;
 	battery_soc->param.t_update_state_cov.col = UKF_STATE_DIM;
-	battery_soc->param.t_update_state_cov.entries = &soc_entries.t_update_state_covariance_entries[0];
+	battery_soc->param.t_update_state_cov.entries = &soc_entries->t_update_state_covariance_entries[0];
 
 	battery_soc->param.m_update_state_cov.row = UKF_STATE_DIM;
 	battery_soc->param.m_update_state_cov.col = UKF_STATE_DIM;
-	battery_soc->param.m_update_state_cov.entries = &soc_entries.m_update_state_covariance_entries[0];
+	battery_soc->param.m_update_state_cov.entries = &soc_entries->m_update_state_covariance_entries[0];
 }
 
 static void entries_init(SOC_UKF* battery_soc, __attribute__((unused)) const float soh){

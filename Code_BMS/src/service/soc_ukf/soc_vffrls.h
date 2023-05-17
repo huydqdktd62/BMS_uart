@@ -12,7 +12,7 @@
 
 typedef struct Battery_param_t Battery_param;
 
-struct Battery_param_t{
+struct Battery_param_t {
 	float R0;
 	float R1;
 	float C1;
