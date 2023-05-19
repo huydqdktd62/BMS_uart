@@ -22,7 +22,7 @@ char *buff_soc[3];
 char buff_handle[512];
 uint32_t len_handle = 0;
 fsp_err_t err;
-SOC_Parameter_Entries bms_entries;
+SOC_Parameter_Entries soc_entries;
 SOC_UKF bms_soc;
 
 void uart_write(const uint8_t *buff,uint32_t len);
@@ -112,19 +112,16 @@ int string_split(char* source,char* str,char *dest[]){
 int init_flag = 0;
 
 void process_handle(char* buff, __attribute__((unused)) uint32_t len){
-    if(init_flag == 0){
-        uint32_t pack_voltage;
-        int32_t pack_current;
-        pack_voltage = (uint32_t)atoi(buff_soc[0]);
-        pack_current = (int32_t)atoi(buff_soc[1]);
-        load_soc(&bms_soc, 100.0f*get_soc_from_ocv((float)pack_voltage/16000.0f));
-        ukf_init(pack_voltage, pack_current, &bms_soc);
-        parameters_init(&bms_soc, bms_entries);
-    }else{
-        string_split(buff,",",buff_soc);
-         bms_soc.input.pack_voltage = (uint32_t)atoi(buff_soc[0]);
-         bms_soc.input.pack_current = (int32_t)atoi(buff_soc[1]);
-
+    string_split(buff,",",buff_soc);
+    bms_soc.input.pack_voltage = (uint32_t)atoi(buff_soc[0]);
+    bms_soc.input.pack_current = (int32_t)atoi(buff_soc[1]);
+    if (init_flag == 0){
+        load_soc(&bms_soc, 100.0f*get_soc_from_ocv((float)bms_soc.input.pack_voltage/16000.0f));
+        ukf_init(bms_soc.input.pack_voltage, bms_soc.input.pack_current, &bms_soc);
+        ukf_parameters_init(&bms_soc, &soc_entries);
+        init_flag = 1;
+    }
+    else{
          for(uint16_t i = 0; i< SOC_PERIOD;i++){
              ukf_update(&bms_soc, 1);
          }

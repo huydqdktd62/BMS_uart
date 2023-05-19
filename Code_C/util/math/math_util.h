@@ -12,7 +12,9 @@
 float get_min_f(float value1, float value2);
 float get_max_f(float value1, float value2);
 float absolute_f(float x);
+int64_t absolute_int64(int64_t x);
 float square_root_f(float x);
+int64_t square_root_int64(int64_t x);
 float cube_root_f(float x);
 float diff_f(float x, float y);
 float exponent_f(float x);

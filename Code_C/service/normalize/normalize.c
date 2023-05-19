@@ -114,13 +114,9 @@ int normalize(const SOC_UKF *logger, SOC_UKF *processor, const Parameter type) {
 		for (i = 0; i < UKF_SIGMA_FACTOR; i++) {
 			processor->param.priori_est_state.entries[0] += m_weight[i]
 					* logger->param.sigma_points.entries[i];
-		}
-		for (i = 0; i < UKF_SIGMA_FACTOR; i++) {
 			processor->param.priori_est_state.entries[1] += m_weight[i]
 					* logger->param.sigma_points.entries[UKF_SIGMA_FACTOR
 							+ i];
-		}
-		for (i = 0; i < UKF_SIGMA_FACTOR; i++) {
 			processor->param.priori_est_state.entries[2] += m_weight[i]
 					* logger->param.sigma_points.entries[2
 							* UKF_SIGMA_FACTOR + i];
@@ -152,7 +148,7 @@ int normalize(const SOC_UKF *logger, SOC_UKF *processor, const Parameter type) {
 					processor->param.m3_update_state_cov);
 			scalar_multiply(processor->param.m3_update_state_cov, c_weight[i],
 					processor->param.m3_update_state_cov);
-			sum(logger->param.state_cov,
+			sum(processor->param.state_cov,
 					processor->param.m3_update_state_cov,
 					processor->param.state_cov);
 		}

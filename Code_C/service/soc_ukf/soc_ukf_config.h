@@ -10,6 +10,7 @@
 
 #define LFP											0
 #define INR											1
+#define NORMALIZED_CODE								1
 
 #define ZERO										(0.0f)
 #define ONE											(1.0f)
@@ -66,8 +67,8 @@
  * UKF Algorithm parameters...
  */
 #define SOC_NORMALIZED_GAIN							(100.0f)
+#define SOC_PERIOD									(50)
 #define UKF_DEFAULT_MEASUREMENT_COVARIANCE			(0.4472f)
-#define SOC_PERIOD									(70)
 #define UKF_SOC_MAX_ERROR_percent					(10.0f)
 #define UKF_SAMPLE_TIME_s							((APP_STATE_MACHINE_UPDATE_TICK_mS*SOC_PERIOD)*0.001)
 

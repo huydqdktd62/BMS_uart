@@ -169,6 +169,9 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1900880215.1208583277" name="test_normalized.c" rcbsApplicability="disable" resourcePath="src/test/test_normalized.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433.1832202885">
+						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433.1832202885" name="GNU Arm Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433"/>
+					</fileInfo>
 					<folderInfo id="com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1900880215.1599599568" name="/" resourcePath="src/board/uart">
 						<toolChain id="com.renesas.cdt.managedbuild.gnuarm.toolchain.elf.debug.2115113258" name="GCC ARM Embedded" superClass="com.renesas.cdt.managedbuild.gnuarm.toolchain.elf.debug" unusedChildren="">
 							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createflash.962490095.1689058183" name="Create flash image" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createflash.962490095"/>
@@ -270,7 +273,7 @@
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra_gen"/>
-						<entry excluding="test/test.c|board/uart|hal_entry.c|service/canopen/test|service/canopen/example|service/modbus/tcp|service/modbus/ascii" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="test/test_normalized.c|board/uart|hal_entry.c|service/canopen/test|service/canopen/example|service/modbus/tcp|service/modbus/ascii" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

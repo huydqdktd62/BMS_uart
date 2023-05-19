@@ -51,11 +51,11 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.1366927885" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.mingw.exe.debug.841946990.1134701557" name="test_refactor.c" rcbsApplicability="disable" resourcePath="test/test_refactor.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1497719554.314388842">
-						<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1497719554.314388842" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1497719554"/>
+					<fileInfo id="cdt.managedbuild.config.gnu.mingw.exe.debug.841946990.206786126" name="soc_ukf.c" rcbsApplicability="disable" resourcePath="service/soc_ukf/soc_ukf.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1497719554.1233830116">
+						<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1497719554.1233830116" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1497719554"/>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="test/test_refactor.c|test/test_soc_v2.c|service/soc_ukf_refactor|service/soc_aukf|service/magic_number" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="service/soc_ukf/soc_ukf.c|test/test_refactor.c|test/test_soc_v2.c|service/soc_ukf_refactor|service/soc_aukf|service/magic_number" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

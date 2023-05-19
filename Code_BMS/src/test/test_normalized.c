@@ -130,13 +130,148 @@ int string_split(char* source,char* str,char *dest[]){
     return i;
 }
 
+int64_t priori_est_state_64_bit[UKF_STATE_DIM] = {0};
+int64_t sigma_point_64_bit[UKF_STATE_DIM * UKF_SIGMA_FACTOR];
+const int64_t m_weight_64_bit[UKF_SIGMA_FACTOR] = {     -2999,
+                                    500,
+                                    500,
+                                    500,
+                                    500,
+                                    500,
+                                    500 };
+int64_t est_measurement_64_bit;
+int64_t sigma_measurement_64_bit[UKF_SIGMA_FACTOR];
+
+int64_t cross_covariance_64_bit[UKF_SIGMA_FACTOR];
+int64_t sigma_state_err_64_bit[UKF_STATE_DIM * UKF_SIGMA_FACTOR];
+int64_t sigma_measurement_err_64_bit[UKF_SIGMA_FACTOR];
+const int64_t c_weight_64_bit[UKF_SIGMA_FACTOR] = {
+        -3002,
+        500,
+        500,
+        500,
+        500,
+        500,
+        500
+};
+
+const int64_t default_system_covariance_64_bit[] = {
+        1000000, 0, 0,
+        0, 10000, 0,
+        0, 0, 200000000
+};
+int64_t state_covariance_64_bit[UKF_STATE_DIM * UKF_STATE_DIM];
+
+const int64_t default_measurement_covariance_64_bit = 447200000000;
+int64_t measurement_covariance_64_bit;
+
 void process_handle(char* buff, __attribute__((unused)) uint32_t len){
 
     string_split(buff,",",buff_soc);
     load_battery_data_from_buff(NORMALIZED_TYPE);
-    synchronize_in(&input_logger, &logger);
-    normalize(&logger, &processor, NORMALIZED_TYPE);
-    synchronize_out(&processor, &output_logger);
+
+    int32_t j,k;
+    int32_t r,c;
+
+    switch(NORMALIZED_TYPE){
+    case PRIOR_STATE:
+        for (j = 0; j < UKF_STATE_DIM * UKF_SIGMA_FACTOR; j++){
+            sigma_point_64_bit[j] = (int64_t)(input_logger.sigma_points[j]);
+        }
+        for (j = 0; j < UKF_STATE_DIM; j++){
+            priori_est_state_64_bit[j] = 0;
+        }
+        for (j = 0; j < UKF_SIGMA_FACTOR; j++) {
+            priori_est_state_64_bit[0] += m_weight_64_bit[j]
+                    * sigma_point_64_bit[j];
+        }
+        for (j = 0; j < UKF_SIGMA_FACTOR; j++) {
+            priori_est_state_64_bit[1] += m_weight_64_bit[j]
+                    * sigma_point_64_bit[UKF_SIGMA_FACTOR + j];
+        }
+        for (j = 0; j < UKF_SIGMA_FACTOR; j++) {
+            priori_est_state_64_bit[2] += m_weight_64_bit[j]
+                    * sigma_point_64_bit[2 * UKF_SIGMA_FACTOR + j];
+        }
+        for (j = 0; j < UKF_STATE_DIM; j++){
+            output_logger.priori_estimate_state[j] = (int32_t)priori_est_state_64_bit[j];
+        }
+        break;
+    case PREDICT_MEASUREMENT:
+        est_measurement_64_bit = 0;
+        for (j = 0; j < UKF_SIGMA_FACTOR; j++){
+            sigma_measurement_64_bit[j] = (int64_t)(input_logger.sigma_measurements[j]);
+        }
+        for (j = 0; j < UKF_SIGMA_FACTOR; j++) {
+            est_measurement_64_bit += m_weight_64_bit[j]
+                    * sigma_measurement_64_bit[j];
+        }
+        output_logger.est_measurement = (int32_t)est_measurement_64_bit;
+        break;
+    case CROSS_COVARIANCE:
+        for (j = 0; j < UKF_STATE_DIM * UKF_SIGMA_FACTOR; j++){
+            sigma_state_err_64_bit[j] = (int64_t)(input_logger.sigma_state_error[j]);
+        }
+        for (j = 0; j < UKF_SIGMA_FACTOR; j++){
+            sigma_measurement_err_64_bit[j] = (int64_t)(input_logger.sigma_measurement_error[j]);
+        }
+        for (j = 0; j < UKF_STATE_DIM; j++){
+            cross_covariance_64_bit[j] = 0;
+        }
+        for (j = 0; j < UKF_STATE_DIM; j++){
+            for (k = 0; k < UKF_SIGMA_FACTOR; k++){
+                cross_covariance_64_bit[j] +=
+                        (int64_t) (input_logger.sigma_state_error[j * UKF_SIGMA_FACTOR + k])
+                                * c_weight_64_bit[k]
+                                * sigma_measurement_err_64_bit[k];
+            }
+        }
+        for (j = 0; j < UKF_STATE_DIM; j++){
+            output_logger.cross_covariance[j] = (int32_t)((float)cross_covariance_64_bit[j]/1000.0f);
+        }
+        break;
+    case MEASUREMENT_COVARIANCE:
+        measurement_covariance_64_bit = default_measurement_covariance_64_bit;
+        for (j = 0; j < UKF_SIGMA_FACTOR; j++){
+            sigma_measurement_err_64_bit[j] = (int64_t)input_logger.sigma_measurement_error[j];
+            measurement_covariance_64_bit += c_weight_64_bit[j]
+                    * sigma_measurement_err_64_bit[j]
+                    * sigma_measurement_err_64_bit[j];
+        }
+        output_logger.measurement_cov = (int32_t)((float)measurement_covariance_64_bit/1000000.0f);
+        break;
+    case PRIOR_STATE_COVARIANCE:
+        for (j = 0; j < UKF_STATE_DIM * UKF_SIGMA_FACTOR; j++){
+            sigma_state_err_64_bit[j] = (int64_t)input_logger.sigma_state_error[j];
+        }
+        for (j = 0; j < UKF_STATE_DIM * UKF_STATE_DIM; j++){
+            state_covariance_64_bit[j] = default_system_covariance_64_bit[j];
+        }
+        for (j = 0; j < UKF_SIGMA_FACTOR; j++){
+            for (r = 0; r < UKF_STATE_DIM; r++){
+                for (c = 0; c < UKF_STATE_DIM; c ++){
+                    state_covariance_64_bit[r * UKF_STATE_DIM + c] +=
+                            sigma_state_err_64_bit[r * UKF_SIGMA_FACTOR
+                                    + j] * c_weight_64_bit[j]
+                                    * sigma_state_err_64_bit[c
+                                            * UKF_SIGMA_FACTOR + j];
+                }
+            }
+        }
+        for (j = 0; j < UKF_STATE_DIM * UKF_STATE_DIM; j++){
+            output_logger.state_covariance[j] = (int32_t)state_covariance_64_bit[j];
+        }
+        break;
+    default:
+        synchronize_in(&input_logger, &logger);
+        normalize(&logger, &processor, NORMALIZED_TYPE);
+        synchronize_out(&processor, &output_logger);
+        break;
+    }
+
+//    synchronize_in(&input_logger, &logger);
+//    normalize(&logger, &processor, NORMALIZED_TYPE);
+//    synchronize_out(&processor, &output_logger);
     save_data_bms(NORMALIZED_TYPE);
 }
 
@@ -203,9 +338,6 @@ int32_t create_data_bms(const Parameter data_type){
         }
         break;
     case PRIOR_STATE_COVARIANCE:
-        for (i = 1; i < 10; i++){
-            uart_print("state_covariance %d,", i);
-        }
         for (i = 1; i < 22; i++){
             uart_print("sigma_state_error %d,", i);
         }
@@ -366,9 +498,6 @@ int32_t load_battery_data_from_buff(const Parameter data_type){
             }
             break;
         case PRIOR_STATE_COVARIANCE:
-            for (i = 0; i < UKF_STATE_DIM*UKF_STATE_DIM; i++){
-                input_logger.state_covariance[i] = (int32_t)atof(buff_soc[index++]);
-            }
             for (i = 0; i < UKF_STATE_DIM*UKF_SIGMA_FACTOR; i++){
                 input_logger.sigma_state_error[i] = (int32_t)atof(buff_soc[index++]);
             }
@@ -505,9 +634,6 @@ int32_t save_data_bms(const Parameter data_type) {
         }
         break;
     case PRIOR_STATE_COVARIANCE:
-        for (i = 0; i < 9; i++){
-            uart_print("%d,", input_logger.state_covariance[i]);
-        }
         for (i = 0; i < 21; i++){
             uart_print("%d,", input_logger.sigma_state_error[i]);
         }

@@ -10,8 +10,8 @@
 
 #include "data_logger.h"
 
-#define TEST_SOC					0
-#define NORMALIZED_TYPE				SIGMA_MEASUREMENT
+#define TEST_SOC					1
+#define NORMALIZED_TYPE				PRIOR_STATE_COVARIANCE
 #define TEST_STR                    0
 #define SOC_BUFF_SIZE               40
 #define BUFF_HANDLE_SIZE            1024

@@ -69,9 +69,6 @@ int32_t create_data(const char *file_path, FILE *out_file, const Parameter type)
 		}
 		break;
 	case PRIOR_STATE_COVARIANCE:
-		for (i = 1; i < 10; i++){
-			fprintf(out_file, "state_covariance %d,", i);
-		}
 		for (i = 1; i < 22; i++){
 			fprintf(out_file, "sigma_state_error %d,", i);
 		}
@@ -250,9 +247,6 @@ int32_t save_data(const char *file_path, FILE *out_file, const Parameter type,
 		}
 		break;
 	case PRIOR_STATE_COVARIANCE:
-		for (i = 0; i < 9; i++){
-			fprintf(out_file, "%d,", input_logger.state_covariance[i]);
-		}
 		for (i = 0; i < 21; i++){
 			fprintf(out_file, "%d,", input_logger.sigma_state_error[i]);
 		}

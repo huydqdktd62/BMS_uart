@@ -73,6 +73,19 @@ void synchronize_matrix_e9(const int32_t* entry, Matrix* dst){
 
 int normalize(const SOC_UKF *logger, SOC_UKF *processor, const Parameter type) {
 	uint8_t i, j;
+
+	int64_t priori_est_state_64_bit[UKF_STATE_DIM] = {0};
+	int64_t sigma_point_64_bit[UKF_STATE_DIM * UKF_SIGMA_FACTOR];
+	const int64_t m_weight_64_bit[UKF_SIGMA_FACTOR] = {     -2999,
+	                                    500,
+	                                    500,
+	                                    500,
+	                                    500,
+	                                    500,
+	                                    500 };
+
+
+
 	switch (type) {
 	case SIGMA_POINT:
 		hgenerate(logger->param.est_state, UKF_STATE_DIM,
@@ -107,6 +120,32 @@ int normalize(const SOC_UKF *logger, SOC_UKF *processor, const Parameter type) {
 				processor->param.sigma_points);
 		break;
 	case PRIOR_STATE:
+
+
+
+//        for (i = 0; i < UKF_STATE_DIM * UKF_SIGMA_FACTOR; i++){
+//            sigma_point_64_bit[i] = (int64_t)(logger->param.sigma_points.entries[i] * 1000000.0f);
+//        }
+//	    for (i = 0; i < UKF_STATE_DIM; i++){
+//	        priori_est_state_64_bit[i] = 0;
+//	    }
+//        for (i = 0; i < UKF_SIGMA_FACTOR; i++) {
+//            priori_est_state_64_bit[0] += m_weight_64_bit[i]
+//                    * sigma_point_64_bit[i];
+//        }
+//        for (i = 0; i < UKF_SIGMA_FACTOR; i++) {
+//            priori_est_state_64_bit[1] += m_weight_64_bit[i]
+//                    * sigma_point_64_bit[UKF_SIGMA_FACTOR + i];
+//        }
+//        for (i = 0; i < UKF_SIGMA_FACTOR; i++) {
+//            priori_est_state_64_bit[2] += m_weight_64_bit[i]
+//                    * sigma_point_64_bit[2 * UKF_SIGMA_FACTOR + i];
+//        }
+//        for (i = 0; i < UKF_STATE_DIM; i++){
+//            processor->param.priori_est_state.entries[i] = (float)priori_est_state_64_bit[i]/1000000.0f;
+//        }
+
+
 		for (i = 0; i < UKF_STATE_DIM; i++) {
 			processor->param.priori_est_state.entries[i] = ZERO;
 		}
@@ -124,6 +163,11 @@ int normalize(const SOC_UKF *logger, SOC_UKF *processor, const Parameter type) {
 					* logger->param.sigma_points.entries[2
 							* UKF_SIGMA_FACTOR + i];
 		}
+
+
+
+
+
 		break;
 	case SIGMA_STATE_ERROR:
 		hgenerate(logger->param.priori_est_state, UKF_SIGMA_FACTOR,

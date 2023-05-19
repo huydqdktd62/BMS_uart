@@ -139,7 +139,7 @@ struct SOC_UKF_t {
 void load_soc(SOC_UKF *battery_soc, const float soc);
 void ukf_init(const uint32_t pack_voltage, const int32_t pack_current,
 		SOC_UKF *battery_soc);
-void ukf_parameters_init(SOC_UKF* battery_soc, SOC_Parameter_Entries* soc_entries);
+void ukf_parameters_init(SOC_UKF* battery_soc, SOC_Parameter_Entries* init_entries);
 uint8_t ukf_update(SOC_UKF *battery_soc, const float soh);
 
 extern SOC_Parameter_Entries soc_entries;
