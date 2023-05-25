@@ -9,91 +9,116 @@
 #include "data_logger.h"
 #include "normalize.h"
 #include "app_config.h"
+#include "../soc_ukf/soc_ukf.h"
 
 
-#define INPUT_SAMPLE_SIZE				3000
+#define INPUT_SAMPLE_SIZE				100000
 
-const char *data_file_path = "normalized_input.csv";
+const char *data_file_path = "input.csv";
 const char *output_ocv_data_file = "normalized_output_PC.csv";
 
-static Data_Logger input_vector[INPUT_SAMPLE_SIZE];
+static BMS_Input_Vector input_vector[INPUT_SAMPLE_SIZE];
 FILE *out_file;
 
-SOC_Parameter_Entries logger_entries;
-SOC_Parameter_Entries processor_entries;
-SOC_UKF logger;
-SOC_UKF processor;
-
+uint32_t soc = 0.0f;
 int test_circle = 0;
-Data_Logger input_logger;
-Data_Logger output_logger;
-
-//const int64_t m_weight[7] = {-2999, 500, 500, 500, 500, 500, 500};
-//const int64_t c_weight[7] = {-3002, 500, 500, 500, 500, 500, 500};
-
+SOC_parameter soc_parameter;
+SOC_UKF bms_soc;
 
 static void show_circle(const int32_t sample) {
 	printf("circle %d\n", sample);
 }
 
-typedef struct SOC_Parameter_64_bit_t SOC_Parameter_64_bit;
-struct SOC_Parameter_64_bit_t{
-	int64_t estimate_state[UKF_STATE_DIM];
-	int64_t state_covariance[UKF_STATE_DIM * UKF_STATE_DIM];
-	int64_t sigma_points[UKF_STATE_DIM * UKF_SIGMA_FACTOR];
-	int64_t sigma_state_error[UKF_STATE_DIM * UKF_SIGMA_FACTOR];
-	int64_t priori_estimate_state[UKF_STATE_DIM];
-	int64_t matrix_A[UKF_STATE_DIM * UKF_STATE_DIM];
-	int64_t matrix_B[UKF_STATE_DIM * UKF_DYNAMIC_DIM];
-	int64_t matrix_C[UKF_MEASUREMENT_DIM * UKF_STATE_DIM];
-	int64_t matrix_D[UKF_DYNAMIC_DIM * UKF_MEASUREMENT_DIM];
-	int64_t observed_measurement[UKF_MEASUREMENT_DIM];
-	int64_t sigma_measurement[UKF_MEASUREMENT_DIM * UKF_SIGMA_FACTOR];
-	int64_t estimate_measurement;
-	int64_t sigma_measurement_error[UKF_MEASUREMENT_DIM * UKF_SIGMA_FACTOR];
-	int64_t measurement_covariance;
-	int64_t cross_covariance[UKF_STATE_DIM];
-	int64_t kalman_gain[UKF_STATE_DIM];
-	int64_t m_update_sigma_state[UKF_STATE_DIM];
+static int32_t create_est_data(const char *file_path, FILE *out_file) {
 
-};
-SOC_Parameter_64_bit soc_parameter_64_bit;
+	out_file = fopen(file_path, "w"); // write only
 
-int64_t priori_est_state_64_bit[UKF_STATE_DIM];
-int64_t sigma_point_64_bit[UKF_STATE_DIM * UKF_SIGMA_FACTOR];
-const int64_t m_weight_64_bit[UKF_SIGMA_FACTOR] = {     -2999,
-                                    500,
-                                    500,
-                                    500,
-                                    500,
-                                    500,
-                                    500 };
+	if (out_file == NULL) {
+		printf("Error! Could not write to file\n");
+		return -1;
+	}
+	fprintf(out_file, "test_circle,SOC,SOC_f,");
+	fprintf(out_file, "terminalVoltage,current,");
+	fprintf(out_file, "H_param,");
+	fprintf(out_file, "a_est_state1,a_est_state2,a_est_state3,");
 
-int64_t est_measurement_64_bit;
-int64_t sigma_measurement_64_bit[UKF_SIGMA_FACTOR];
+	fprintf(out_file, "a_state_cov1,a_state_cov2,a_state_cov3,");
+	fprintf(out_file, "a_state_cov4,a_state_cov5,a_state_cov6,");
+	fprintf(out_file, "a_state_cov7,a_state_cov8,a_state_cov9,");
 
-int64_t cross_covariance_64_bit[UKF_SIGMA_FACTOR];
-int64_t sigma_state_err_64_bit[UKF_STATE_DIM * UKF_SIGMA_FACTOR];
-int64_t sigma_measurement_err_64_bit[UKF_SIGMA_FACTOR];
-const int64_t c_weight_64_bit[UKF_SIGMA_FACTOR] = {
-		-3002,
-		500,
-		500,
-		500,
-		500,
-		500,
-		500
-};
+	fprintf(out_file, "sig1_1,sig1_2,sig1_3,sig1_4,sig1_5,sig1_6,sig1_7,");
+	fprintf(out_file, "sig2_1,sig2_2,sig2_3,sig2_4,sig2_5,sig2_6,sig2_7,");
+	fprintf(out_file, "sig3_1,sig3_2,sig3_3,sig3_4,sig3_5,sig3_6,sig3_7,");
+	fprintf(out_file, "pri_state1,pri_state2,pri_state3,");
+	fprintf(out_file,
+			"e_sig1_1,e_sig1_2,e_sig1_3,e_sig1_4,e_sig1_5,e_sig1_6,e_sig1_7,");
+	fprintf(out_file,
+			"e_sig2_1,e_sig2_2,e_sig2_3,e_sig2_4,e_sig2_5,e_sig2_6,e_sig2_7,");
+	fprintf(out_file,
+			"e_sig3_1,e_sig3_2,e_sig3_3,e_sig3_4,e_sig3_5,e_sig3_6,e_sig3_7,");
+	fprintf(out_file, "measur_cov,est_measur,");
+	fprintf(out_file, "a_cross1,a_cross2,a_cross3,");
+	fprintf(out_file, "a_kal1,a_kal2,a_kal3,");
+	fprintf(out_file, "A1,A2,A3,A4,A5,A6,A7,A8,A9,");
+	fprintf(out_file, "B1,B2,B3,B4,B5,B6,");
+	fprintf(out_file, "C1,C2,C3,");
+	fprintf(out_file, "D1,D2,");
+	fprintf(out_file, "I,sign(I),");
+	fprintf(out_file, "sig_m1,sig_m2,sig_m3,sig_m4,sig_m5,sig_m6,sig_m7,");
+	fprintf(out_file,
+			"e_sig_m1,e_sig_m2,e_sig_m3,e_sig_m4,e_sig_m5,e_sig_m6,e_sig_m7");
 
-const int64_t default_measurement_covariance_64_bit = 447200000000;
-int64_t measurement_covariance_64_bit;
+	fprintf(out_file, "\n");
+	fclose(out_file);
+	return 0;
+}
 
-const int64_t default_system_covariance_64_bit[] = {
-		1000000, 0, 0,
-		0, 10000, 0,
-		0, 0, 200000000
-};
-int64_t state_covariance_64_bit[UKF_STATE_DIM * UKF_STATE_DIM];
+static int32_t save_est_data(const char *file_path, const uint32_t pack_voltage, const int32_t pack_current,	FILE *out_file) {
+	out_file = fopen(file_path, "a");
+	test_circle++;
+
+	fprintf(out_file, "%i,%d,%d,", test_circle, bms_soc.output.SOC,(int32_t)(bms_soc.output.SOC_f*1000000.0f));
+	fprintf(out_file, "%d,%d,", bms_soc.input.pack_voltage,bms_soc.input.pack_current);
+	fprintf(out_file, "%d,", (int32_t)(soc_parameter.H_param*1000000.0f));
+	int i;
+	for (i = 0; i < 3; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.estimate_state_entries[i]*1000000.0f));
+
+	for (i = 0; i < 9; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.state_covariance_entries[i]*10000000000.0f));
+
+	for (i = 0; i < 21; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.sigma_points_entries[i]*1000000.0f));
+	fprintf(out_file, "%d,%d,%d,", (int32_t)(soc_parameter.priori_estimate_state_entries[0]*1000000.0f),
+            (int32_t)(soc_parameter.priori_estimate_state_entries[1]*1000000.0f),
+            (int32_t)(soc_parameter.priori_estimate_state_entries[2]*1000000.0f));
+	for (i = 0; i < 21; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.sigma_state_error_entries[i]*1000000000.0f));
+	fprintf(out_file, "%d,%d,", (int32_t)(soc_parameter.measurement_cov*1000000.0f),
+            (int32_t)(soc_parameter.est_measurement*1000000.0f));
+	for (i = 0; i < 3; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.cross_covariance_entries[i]*1000000000.0f));
+	for (i = 0; i < 3; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.aukf_kalman_gain_entries[i]*1000000000.0f));
+	for (i = 0; i < 9; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.matrix_A_entries[i]*1000000.0f));
+	for (i = 0; i < 6; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.matrix_B_entries[i]*1000000.0f));
+	for (i = 0; i < 3; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.matrix_C_entries[i]*1000000.0f));
+	for (i = 0; i < 2; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.matrix_D_entries[i]*1000000.0f));
+	fprintf(out_file, "%d,%d,", (int32_t)(soc_parameter.observed_measurement_entries[0]*1000000.0f),
+            (int32_t)(soc_parameter.observed_measurement_entries[1]*1000000.0f));
+	for (i = 0; i < 7; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.sigma_measurements_entries[i]*1000000.0f));
+	for (i = 0; i < 7; i++)
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.sigma_measurement_error_entries[i]*1000000.0f));
+
+	fprintf(out_file, "\n");
+	fclose(out_file);
+	return 0;
+}
 
 int hal_entry(void) {
 
@@ -104,239 +129,21 @@ int hal_entry(void) {
 	}
 	printf("Sample size: %d\n", sample_size);
 
-	create_data(output_ocv_data_file, out_file, NORMALIZED_TYPE);
-	load_soc(&processor, 80);
-	load_soc(&logger, 80);
-	ukf_parameters_init(&logger, &logger_entries);
-	ukf_parameters_init(&processor, &processor_entries);
-	ukf_init(66000, 0, &logger);
-	ukf_init(66000, 0, &processor);
+	create_est_data(output_ocv_data_file, out_file);
+	bms_soc.input.pack_voltage = input_vector[0].terminalVoltage;
+	bms_soc.input.pack_current = input_vector[0].current;
+	load_soc(&bms_soc, 100.0f*get_soc_from_ocv((float)bms_soc.input.pack_voltage/PACK_VOLTAGE_NORMALIZED_GAIN));
+	ukf_parameters_create(&soc_parameter);
+	ukf_init(&bms_soc);
+	ukf_update(&bms_soc, 1.0f);
 	for (int i = 0; i < sample_size; i++) {
-		input_logger = input_vector[i];
-	    int32_t j,k;
-	    int32_t r,c;
-	    int64_t buff;
-
-		switch(NORMALIZED_TYPE){
-		case SIGMA_POINT:
-			for (j = 0; j < UKF_STATE_DIM; j++){
-				soc_parameter_64_bit.estimate_state[i] = (int64_t)input_logger.estimate_state[j];
-			}
-			for (j = 0; j < UKF_STATE_DIM * UKF_STATE_DIM; j++){
-				soc_parameter_64_bit.state_covariance[j] = (int64_t)input_logger.state_covariance[j];
-			}
-			for (j = 0; j < UKF_STATE_DIM; j++){
-				for (k = 0; k < UKF_SIGMA_FACTOR; k++){
-					soc_parameter_64_bit.sigma_points[j * UKF_SIGMA_FACTOR + k] = soc_parameter_64_bit.estimate_state[j];
-				}
-			}
-//			hgenerate(battery_soc->param.est_state, UKF_STATE_DIM, battery_soc->param.g1_create_sigma_point);
-//			chol(battery_soc->param.state_cov, battery_soc->param.g2_create_sigma_point);
-//			scalar_multiply(battery_soc->param.g2_create_sigma_point, UKF_GAMMA_RATIO, battery_soc->param.g2_create_sigma_point);
-//			sum(battery_soc->param.g1_create_sigma_point, battery_soc->param.g2_create_sigma_point, battery_soc->param.g1_create_sigma_point);
-//			scalar_multiply(battery_soc->param.g2_create_sigma_point, 2, battery_soc->param.g2_create_sigma_point);
-//			minus(battery_soc->param.g1_create_sigma_point, battery_soc->param.g2_create_sigma_point, battery_soc->param.g2_create_sigma_point);
-//			htri_concat(battery_soc->param.est_state, battery_soc->param.g1_create_sigma_point, battery_soc->param.g2_create_sigma_point,
-//					battery_soc->param.sigma_points);
-			break;
-		case SIGMA_STATE:
-			for (j = 0; j < UKF_STATE_DIM * UKF_STATE_DIM; j++){
-				soc_parameter_64_bit.matrix_A[j] = input_logger.matrix_A[j];
-			}
-			for (j = 0; j < UKF_STATE_DIM * UKF_DYNAMIC_DIM; j++){
-				soc_parameter_64_bit.matrix_B[j] = input_logger.matrix_B[j];
-			}
-			for (j = 0; j < UKF_MEASUREMENT_DIM; j++){
-				soc_parameter_64_bit.observed_measurement[j] = input_logger.observed_measurement[j];
-			}
-			for (j = 0; j < UKF_STATE_DIM * UKF_SIGMA_FACTOR; j++){
-				soc_parameter_64_bit.sigma_points[j] = input_logger.sigma_points[j];
-			}
-			for (j = 0; j < UKF_STATE_DIM * UKF_DYNAMIC_DIM; j++){
-				soc_parameter_64_bit.m_update_sigma_state[j] = 0;
-			}
-
-			multiply(battery_soc->param.matrix_B, battery_soc->param.observed_measurement, battery_soc->param.m_update_sigma_state);
-			hgenerate(battery_soc->param.m_update_sigma_state, UKF_SIGMA_FACTOR, battery_soc->param.g_update_sigma_state);
-			multiply(battery_soc->param.matrix_A, battery_soc->param.sigma_points, battery_soc->param.sigma_points);
-			sum(battery_soc->param.sigma_points, battery_soc->param.g_update_sigma_state, battery_soc->param.sigma_points);
-
-			break;
-		case PRIOR_STATE:
-		    for (j = 0; j < UKF_STATE_DIM * UKF_SIGMA_FACTOR; j++){
-		    	soc_parameter_64_bit.sigma_points[j] = (int64_t)(input_logger.sigma_points[j]);
-		    }
-		    for (j = 0; j < UKF_STATE_DIM; j++){
-		    	soc_parameter_64_bit.priori_estimate_state[j] = 0;
-		    }
-		    for (j = 0; j < UKF_SIGMA_FACTOR; j++) {
-		    	soc_parameter_64_bit.priori_estimate_state[0] += m_weight_64_bit[j]
-		                * sigma_point_64_bit[j];
-		    	soc_parameter_64_bit.priori_estimate_state[1] += m_weight_64_bit[j]
-		                * sigma_point_64_bit[UKF_SIGMA_FACTOR + j];
-		    	soc_parameter_64_bit.priori_estimate_state[2] += m_weight_64_bit[j]
-		                * sigma_point_64_bit[2 * UKF_SIGMA_FACTOR + j];
-		    }
-		    for (j = 0; j < UKF_STATE_DIM; j++){
-		        output_logger.priori_estimate_state[j] = (int32_t)soc_parameter_64_bit.priori_estimate_state[j];
-		    }
-		    break;
-		case SIGMA_STATE_ERROR:
-			hgenerate(battery_soc->param.priori_est_state, UKF_SIGMA_FACTOR, battery_soc->param.sigma_state_err);
-			minus(battery_soc->param.sigma_points, battery_soc->param.sigma_state_err, battery_soc->param.sigma_state_err);
-			break;
-		case PRIOR_STATE_COVARIANCE:
-			for (j = 0; j < UKF_STATE_DIM * UKF_SIGMA_FACTOR; j++){
-				soc_parameter_64_bit.sigma_state_error[j] = (int64_t)input_logger.sigma_state_error[j];
-			}
-			for (j = 0; j < UKF_STATE_DIM * UKF_STATE_DIM; j++){
-				soc_parameter_64_bit.state_covariance[j] = default_system_covariance_64_bit[j];
-			}
-			for (j = 0; j < UKF_SIGMA_FACTOR; j++){
-				for (r = 0; r < UKF_STATE_DIM; r++){
-					for (c = 0; c < UKF_STATE_DIM; c ++){
-						soc_parameter_64_bit.state_covariance[r * UKF_STATE_DIM + c] +=
-								soc_parameter_64_bit.sigma_state_error[r * UKF_SIGMA_FACTOR
-										+ j] * c_weight_64_bit[j]
-										* soc_parameter_64_bit.sigma_state_error[c
-												* UKF_SIGMA_FACTOR + j];
-					}
-				}
-			}
-			for (j = 0; j < UKF_STATE_DIM * UKF_STATE_DIM; j++){
-				output_logger.state_covariance[j] = (int32_t)soc_parameter_64_bit.state_covariance[j];
-			}
-			break;
-		case SYSTEM_PARAMETER:
-			battery_soc->param.observed_measurement.entries[0] = battery_soc->param.cell_current;
-			battery_soc->param.observed_measurement.entries[1] = (float) sign_f(battery_soc->param.cell_current);
-			if (absolute_f(battery_soc->param.cell_current) < UKF_OBSERVED_CURRENT_THRESHOLD) { //here 0.1f
-				battery_soc->param.observed_measurement.entries[1] = ZERO;
-			}
-			battery_soc->param.eta = UKF_DISCHARGE_ETA_RATIO;
-			if (battery_soc->param.cell_current < ZERO) {
-				battery_soc->param.eta = UKF_CHARGE_ETA_RATIO;
-			}
-			battery_soc->param.RC_param = exponent_f(-absolute_f((float)UKF_SAMPLE_TIME_s / (battery_param.R1*battery_param.C1)));
-
-		//	aukf_update_matrix_a();
-			battery_soc->param.matrix_A.entries[4] = battery_soc->param.RC_param;
-			battery_soc->param.matrix_A.entries[8] = battery_soc->param.H_param;
-
-		//	aukf_update_matrix_b();
-			battery_soc->param.matrix_B.entries[0] = -(battery_soc->param.eta * (float)UKF_SAMPLE_TIME_s)
-					/ (soh * UKF_NOMIMAL_CAPACITY_AS);
-			battery_soc->param.matrix_B.entries[2] = ONE - battery_soc->param.RC_param;
-			battery_soc->param.matrix_B.entries[5] = battery_soc->param.H_param - ONE;
-
-		//	aukf_update_matrix_c();
-			float d[UKF_SIGMA_FACTOR] = {ZERO};
-			for (i = 0; i < UKF_SIGMA_FACTOR; i++) {
-				d[i] = get_ratio_from_soc(battery_soc->param.sigma_points.entries[i]);
-			}
-			battery_soc->param.matrix_C.entries[0] = (d[0]+d[1]+d[2]+d[3]+d[4]+d[5]+d[6]) / UKF_SIGMA_FACTOR;
-			battery_soc->param.matrix_C.entries[1] = -battery_param.R1;
-
-		//	aukf_update_matrix_d();
-			battery_soc->param.matrix_D.entries[0] = -battery_param.R0;
-
-			break;
-		case SIGMA_MEASUREMENT:
-			multiply(battery_soc->param.matrix_C, battery_soc->param.sigma_points, battery_soc->param.sigma_measurements);
-			float deltaMeasurement;
-			deltaMeasurement = inner_multiply(battery_soc->param.matrix_D, battery_soc->param.observed_measurement);
-			for (i = 0; i < UKF_SIGMA_FACTOR; i++){
-				battery_soc->param.g_update_sigma_measurement.entries[i] = deltaMeasurement;
-			}
-			sum(battery_soc->param.sigma_measurements, battery_soc->param.g_update_sigma_measurement, battery_soc->param.sigma_measurements);
-			break;
-		case PREDICT_MEASUREMENT:
-			soc_parameter_64_bit.estimate_measurement = 0;
-		    for (j = 0; j < UKF_SIGMA_FACTOR; j++){
-		    	soc_parameter_64_bit.sigma_measurement[j] = (int64_t)(input_logger.sigma_measurements[j]);
-		    }
-		    for (j = 0; j < UKF_SIGMA_FACTOR; j++) {
-		    	soc_parameter_64_bit.estimate_measurement += m_weight_64_bit[j]
-		                * soc_parameter_64_bit.sigma_measurement[j];
-		    }
-		    output_logger.est_measurement = (int32_t)soc_parameter_64_bit.estimate_measurement;
-			break;
-		case SIGMA_MEASUREMENT_ERROR:
-			for (i = 0; i < UKF_SIGMA_FACTOR; i++){
-				battery_soc->param.g_update_measurement_cov.entries[i] = battery_soc->param.est_measurement;
-			}
-			minus(battery_soc->param.sigma_measurements, battery_soc->param.g_update_measurement_cov,
-					battery_soc->param.sigma_measurement_err);
-			break;
-		case MEASUREMENT_COVARIANCE:
-			soc_parameter_64_bit.measurement_covariance = default_measurement_covariance_64_bit;
-			for (j = 0; j < UKF_SIGMA_FACTOR; j++){
-				soc_parameter_64_bit.sigma_measurement_error[j] = (int64_t)input_logger.sigma_measurement_error[j];
-				soc_parameter_64_bit.measurement_covariance += c_weight_64_bit[j]
-						* soc_parameter_64_bit.sigma_measurement_error[j]
-						* soc_parameter_64_bit.sigma_measurement_error[j];
-			}
-			output_logger.measurement_cov = (int32_t)((float)soc_parameter_64_bit.measurement_covariance/1000000.0f);
-			break;
-		case CROSS_COVARIANCE:
-			for (j = 0; j < UKF_STATE_DIM * UKF_SIGMA_FACTOR; j++){
-				soc_parameter_64_bit.sigma_state_error[j] = (int64_t)(input_logger.sigma_state_error[j]);
-			}
-			for (j = 0; j < UKF_SIGMA_FACTOR; j++){
-				soc_parameter_64_bit.sigma_measurement_error[j] = (int64_t)(input_logger.sigma_measurement_error[j]);
-			}
-			for (j = 0; j < UKF_STATE_DIM; j++){
-				soc_parameter_64_bit.cross_covariance[j] = 0;
-			}
-			for (j = 0; j < UKF_STATE_DIM; j++){
-				for (k = 0; k < UKF_SIGMA_FACTOR; k++){
-					soc_parameter_64_bit.cross_covariance[j] +=
-							(int64_t) (soc_parameter_64_bit.sigma_measurement_error[j * UKF_SIGMA_FACTOR + k])
-									* c_weight_64_bit[k]
-									* soc_parameter_64_bit.sigma_measurement_error[k];
-				}
-			}
-			for (j = 0; j < UKF_STATE_DIM; j++){
-				output_logger.cross_covariance[j] = (int32_t)((float)soc_parameter_64_bit.cross_covariance[j]/1000.0f);
-			}
-			break;
-		case KALMAN_GAIN:
-			scalar_multiply(battery_soc->param.cross_cov, (ONE / battery_soc->param.measurement_cov),
-					battery_soc->param.kalman_gain);
-
-			break;
-		case POSTERIOR_STATE:
-			scalar_multiply(battery_soc->param.kalman_gain,
-					(battery_soc->param.cell_voltage - battery_soc->param.est_measurement), battery_soc->param.m_update_state);
-			sum(battery_soc->param.priori_est_state, battery_soc->param.m_update_state, battery_soc->param.est_state);
-			break;
-		case POSTERIOR_STATE_COVARIANCE:
-			for (i = 0; i < UKF_STATE_DIM; i++){
-				battery_soc->param.t_update_state_cov.entries[i] = battery_soc->param.kalman_gain.entries[i];
-			}
-			multiply(battery_soc->param.kalman_gain, battery_soc->param.t_update_state_cov,
-					battery_soc->param.m_update_state_cov);
-			scalar_multiply(battery_soc->param.m_update_state_cov, battery_soc->param.measurement_cov,
-					battery_soc->param.m_update_state_cov);
-			minus(battery_soc->param.state_cov, battery_soc->param.m_update_state_cov, battery_soc->param.state_cov);
-			battery_soc->output.SOC_f = battery_soc->param.est_state.entries[0]*SOC_NORMALIZED_GAIN;
-
-			battery_soc->output.SOC = (uint32_t) roundf(battery_soc->output.SOC_f);
-		    if(battery_soc->output.SOC > BMS_SOC_UPPER_LIMIT){
-		    	battery_soc->output.SOC = BMS_SOC_UPPER_LIMIT;
-		    }
-			break;
-		default:
-			break;
-		}
-
-
-
-//		synchronize_in(&input_logger, &logger);
-//		normalize(&logger, &processor, NORMALIZED_TYPE);
-//		synchronize_out(&processor, &output_logger);
-		save_data(output_ocv_data_file, out_file, NORMALIZED_TYPE, &input_logger, &output_logger);
+		bms_soc.input.pack_voltage = input_vector[i].terminalVoltage;
+		bms_soc.input.pack_current = input_vector[i].current;
+		ukf_update(&bms_soc, 1.0f);
+		save_est_data(output_ocv_data_file, bms_soc.input.pack_voltage, bms_soc.input.pack_current, out_file);
+		soc = bms_soc.output.SOC;
 		show_circle(i);
 	}
 	return 0;
 }
+

@@ -5,6 +5,8 @@
  *      Author: ADMIN
  */
 
+#if 0
+
 #include "data_logger.h"
 int test_circle;
 Data_Logger input_logger;
@@ -368,4 +370,5 @@ int32_t save_data(const char *file_path, FILE *out_file, const Parameter type,
 	return 0;
 }
 
+#endif
 

@@ -13,13 +13,12 @@
 #include "stdint.h"
 
 typedef struct BMS_Input_Vector_t BMS_Input_Vector;
-#if TEST_SOC
+
 struct BMS_Input_Vector_t{
 	float terminalVoltage;
 	float current;
-	uint32_t cycles;
 };
-#else
+#if 0
 struct BMS_Input_Vector_t{
 	Data_Logger data_logger;
 };

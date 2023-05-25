@@ -13,7 +13,6 @@ RM := rm -rf
 -include src/test/subdir.mk
 -include src/service/soc_ukf/subdir.mk
 -include src/service/retaget/subdir.mk
--include src/service/normalize/subdir.mk
 -include src/service/modbus/rtu/subdir.mk
 -include src/service/modbus/port/subdir.mk
 -include src/service/modbus/functions/subdir.mk

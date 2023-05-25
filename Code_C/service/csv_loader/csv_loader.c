@@ -13,8 +13,6 @@
 
 static const char* getfield(char* line, int num);
 
-#if TEST_SOC
-
 int32_t load_battery_data_from_csv_file(const char* path,BMS_Input_Vector *buff,const uint32_t max_size){
 
     FILE* stream = fopen(path, "r");
@@ -42,12 +40,6 @@ int32_t load_battery_data_from_csv_file(const char* path,BMS_Input_Vector *buff,
         buff[line_id].current=(float)atof(field);
         free(tmp);
 
-        tmp=strdup(line);
-        field=getfield(tmp, 3);
-        if(NULL==field) return -1;
-        buff[line_id].cycles=(uint32_t)atoi(field);
-        free(tmp);
-
     	line_id++;
     	if(line_id >= max_size){
     		return line_id;
@@ -56,7 +48,7 @@ int32_t load_battery_data_from_csv_file(const char* path,BMS_Input_Vector *buff,
 
     return line_id;
 }
-#else
+#if 0
 int32_t load_battery_data_from_csv_file(const char* path,BMS_Input_Vector *buff,const uint32_t max_size){
 
     FILE* stream = fopen(path, "r");

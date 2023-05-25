@@ -5,6 +5,7 @@
  *      Author: ADMIN
  */
 
+#if 0
 #include "../soc_ukf/soc_ukf.h"
 #include <stdio.h>
 #include "csv_loader.h"
@@ -143,7 +144,7 @@ int hal_entry(void) {
 	cell_cur = input_vector[0].current;
 
 	load_soc(&bms_soc, get_soc_from_ocv((float)cell_vol/PACK_VOLTAGE_NORMALIZED_GAIN));
-	ukf_parameters_init(&bms_soc, &soc_entries);
+	ukf_parameters_init(&bms_soc, soc_entries);
 	ukf_init(cell_vol, cell_cur, &bms_soc);
 
 	for (int i = 1; i < sample_size; i++) {
@@ -158,3 +159,4 @@ int hal_entry(void) {
 	}
 	return 0;
 }
+#endif

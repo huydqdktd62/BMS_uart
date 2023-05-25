@@ -60,7 +60,7 @@ int32_t binary_search_f(float data, const float * const array, int32_t max_size)
 
 }
 
-uint16_t binary_search_int(const uint16_t data, const uint16_t *array,
+uint16_t binary_search_int(const uint32_t data, const uint32_t *array,
                 const uint16_t max_size) {
 
         int16_t lower_bound = 0;
@@ -108,43 +108,13 @@ float absolute_f(float x) {
         return x;
 }
 
-int64_t absolute_int64(int64_t x){
-    if (x < 0)
-            x = -x;
-    return x;
-}
-
 float square_root_f(float x) {
         float guess = 1;
 
-        while (absolute_int64((guess * guess) / x - 1) >= 0.0001)
+        while (absolute_f((guess * guess) / x - 1) >= 0.0001)
                 guess = ((x / guess) + guess) / 2;
 
         return guess;
-}
-
-int64_t square_root_int64(int64_t x){
-	if (x == 0 || x == 1)
-		return x;
-	int64_t start = 1, end = x/2, guess = 0, mid;
-	while (start <= end){
-		mid = (start + end) / 2;
-
-		//If x is a perfect square
-		if (mid * mid == x)
-			return mid;
-
-		// Since we need floor, we update answer when
-		// mid*mid is smaller than x, and move closer to
-		// sqrt(x)
-		if (mid * mid < x){
-			start = mid + 1;
-			guess = mid;
-		}
-		else //If mid*mid is greater than x
-			end = mid -1;
-	}
-	return guess;
 }
 
 float exponent_f(float x) {
