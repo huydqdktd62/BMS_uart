@@ -23,7 +23,7 @@ char buff_handle[512];
 uint32_t len_handle = 0;
 fsp_err_t err;
 int32_t test_cycles = 1;
-SOC_parameter soc_parameter;
+SOC_Parameter soc_parameter;
 SOC_UKF bms_soc;
 
 void uart_write(const uint8_t *buff,uint32_t len);
@@ -153,10 +153,12 @@ void process_handle(char* buff, __attribute__((unused)) uint32_t len){
         init_flag = 1;
     }
     else{
-        ukf_update (&bms_soc, 1.0f);
+        for (int j = 0; j < SOC_PERIOD; j++) {
+             ukf_update(&bms_soc, 1.0f);
+         }
         uart_print ("%d,", test_cycles++);
         uart_print ("%d,%d,%d,%d,", bms_soc.output.SOC, (int32_t) (bms_soc.output.SOC_f * 1000000.0f),
-                    bms_soc.input.pack_voltage, bms_soc.input.pack_current);
+                    bms_soc.filter.avg_pack_voltage, bms_soc.filter.avg_pack_current);
         uart_print ("%d,", (int32_t) (soc_parameter.H_param * 1000000.0f));
         int i;
         for (i = 0; i < 3; i++)

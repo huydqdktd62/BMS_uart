@@ -6,23 +6,22 @@
  */
 #include <stdio.h>
 #include "csv_loader.h"
-#include "data_logger.h"
-#include "normalize.h"
-#include "app_config.h"
 #include "../soc_ukf/soc_ukf.h"
+#include "soc_ukf_config.h"
 
 
 #define INPUT_SAMPLE_SIZE				100000
 
 const char *data_file_path = "input.csv";
-const char *output_ocv_data_file = "normalized_output_PC.csv";
+const char *output_ocv_data_file = "normalized_output_BMS.csv";
 
 static BMS_Input_Vector input_vector[INPUT_SAMPLE_SIZE];
 FILE *out_file;
 
+int8_t state_entries[7];
 uint32_t soc = 0.0f;
 int test_circle = 0;
-SOC_parameter soc_parameter;
+SOC_Parameter soc_parameter;
 SOC_UKF bms_soc;
 
 static void show_circle(const int32_t sample) {
@@ -37,7 +36,7 @@ static int32_t create_est_data(const char *file_path, FILE *out_file) {
 		printf("Error! Could not write to file\n");
 		return -1;
 	}
-	fprintf(out_file, "test_circle,SOC,SOC_f,");
+	fprintf(out_file, "test_circle,state 0, state 1, state 2, state 3, state 4, state 5, state 6,SOC,SOC_f,");
 	fprintf(out_file, "terminalVoltage,current,");
 	fprintf(out_file, "H_param,");
 	fprintf(out_file, "a_est_state1,a_est_state2,a_est_state3,");
@@ -75,12 +74,18 @@ static int32_t create_est_data(const char *file_path, FILE *out_file) {
 
 static int32_t save_est_data(const char *file_path, const uint32_t pack_voltage, const int32_t pack_current,	FILE *out_file) {
 	out_file = fopen(file_path, "a");
-	test_circle++;
-
-	fprintf(out_file, "%i,%d,%d,", test_circle, bms_soc.output.SOC,(int32_t)(bms_soc.output.SOC_f*1000000.0f));
-	fprintf(out_file, "%d,%d,", bms_soc.input.pack_voltage,bms_soc.input.pack_current);
-	fprintf(out_file, "%d,", (int32_t)(soc_parameter.H_param*1000000.0f));
 	int i;
+	test_circle++;
+	fprintf(out_file, "%i,", test_circle);
+	for (i = 0; i < 7; i++){
+		fprintf(out_file, "%d,", state_entries[i]);
+		state_entries[i] = 0;
+	}
+	fprintf(out_file, "%d,%d,", bms_soc.output.SOC,(int32_t)(bms_soc.output.SOC_f*1000000.0f));
+//	fprintf(out_file, "%d,%d,", bms_soc.input.pack_voltage,bms_soc.input.pack_current);
+	fprintf(out_file, "%d,%d,", bms_soc.filter.avg_pack_voltage, bms_soc.filter.avg_pack_current);
+	fprintf(out_file, "%d,", (int32_t)(soc_parameter.H_param*1000000.0f));
+
 	for (i = 0; i < 3; i++)
 		fprintf(out_file, "%d,", (int32_t)(soc_parameter.estimate_state_entries[i]*1000000.0f));
 
@@ -120,6 +125,8 @@ static int32_t save_est_data(const char *file_path, const uint32_t pack_voltage,
 	return 0;
 }
 
+
+
 int hal_entry(void) {
 
 	int32_t sample_size = load_battery_data_from_csv_file(data_file_path,
@@ -139,7 +146,34 @@ int hal_entry(void) {
 	for (int i = 0; i < sample_size; i++) {
 		bms_soc.input.pack_voltage = input_vector[i].terminalVoltage;
 		bms_soc.input.pack_current = input_vector[i].current;
-		ukf_update(&bms_soc, 1.0f);
+		for (int j = 0; j < SOC_PERIOD; j++) {
+			ukf_update(&bms_soc, 1.0f);
+			switch (bms_soc.state) {
+				case SOC_ST_INIT:
+					state_entries[SOC_ST_INIT] = 1;
+					break;
+				case SOC_ST_IDLE:
+					state_entries[SOC_ST_IDLE] = 1;
+					break;
+				case SOC_ST_UKF:
+					state_entries[SOC_ST_UKF] = 1;
+					break;
+				case SOC_ST_COULOMB_COUNTER:
+					state_entries[SOC_ST_COULOMB_COUNTER] = 1;
+					break;
+				case SOC_ST_CALIB:
+					state_entries[SOC_ST_CALIB] = 1;
+					break;
+				case SOC_ST_SLEEP:
+					state_entries[SOC_ST_SLEEP] = 1;
+					break;
+				case SOC_ST_FAULT:
+					state_entries[SOC_ST_FAULT] = 1;
+					break;
+				default:
+					break;
+			}
+		}
 		save_est_data(output_ocv_data_file, bms_soc.input.pack_voltage, bms_soc.input.pack_current, out_file);
 		soc = bms_soc.output.SOC;
 		show_circle(i);

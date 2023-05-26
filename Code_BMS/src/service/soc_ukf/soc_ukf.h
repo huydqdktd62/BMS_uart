@@ -62,8 +62,8 @@ struct SOC_UKF_t {
 	SOC_err err;
 };
 
-typedef struct SOC_parameter_t SOC_parameter;
-struct SOC_parameter_t {
+typedef struct SOC_Parameter_t SOC_Parameter;
+struct SOC_Parameter_t {
 	float estimate_state_entries[UKF_STATE_DIM * 1];
 	float state_covariance_entries[UKF_STATE_DIM * UKF_STATE_DIM];
 	float sigma_points_entries[UKF_STATE_DIM * UKF_SIGMA_FACTOR];
@@ -99,15 +99,12 @@ struct SOC_parameter_t {
 	float m_update_state_covariance_entries[UKF_STATE_DIM * UKF_STATE_DIM];
 };
 
-void ukf_parameters_create(SOC_parameter* parameter);
+void ukf_parameters_create(SOC_Parameter* parameter);
 void load_soc(SOC_UKF *battery_soc, const float soc);
 void ukf_init(SOC_UKF* battery_soc);
 uint8_t ukf_update(SOC_UKF *battery_soc, const float soh);
-#if TEST_UKF
-void soc_update_ukf(SOC_UKF* battery_soc, const float soh);
-#endif
 
 extern SOC_UKF bms_soc;
-extern SOC_parameter soc_parameter;
+extern SOC_Parameter soc_parameter;
 
 #endif /* SERVICE_SOC_AUKF_SOC_UKF_H_ */

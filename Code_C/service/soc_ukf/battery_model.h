@@ -8,7 +8,7 @@
 #ifndef SERVICE_SOC_AUKF_BATTERY_MODEL_H_
 #define SERVICE_SOC_AUKF_BATTERY_MODEL_H_
 
-#include "soc_ukf_config.h"
+#include "../soc_ukf/soc_ukf_config.h"
 
 #define MODEL_SOC_LUT_SIZE				201
 #define MODEL_OCV_LUT_SIZE				201

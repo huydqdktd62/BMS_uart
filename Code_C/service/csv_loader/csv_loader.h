@@ -7,8 +7,6 @@
 
 #ifndef CSV_LOADER_H_
 #define CSV_LOADER_H_
-#include "app_config.h"
-#include "data_logger.h"
 
 #include "stdint.h"
 

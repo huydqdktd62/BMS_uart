@@ -47,10 +47,10 @@
  * UKF Algorithm parameters...
  */
 #define SOC_NORMALIZED_GAIN							(100.0f)
-#define SOC_PERIOD									(60)
+#define SOC_PERIOD									(50)
 #define UKF_DEFAULT_MEASUREMENT_COVARIANCE			(0.0472f)
 #define UKF_SOC_MAX_ERROR_percent					(10.0f)
-#define UKF_SAMPLE_TIME_s							((APP_STATE_MACHINE_UPDATE_TICK_mS*SOC_PERIOD)*0.001)
+#define UKF_SAMPLE_TIME_s							((float)(APP_STATE_MACHINE_UPDATE_TICK_mS*SOC_PERIOD)*0.001f)
 
 #define UKF_EST_STATE_ENTRY_1_INIT_VALUE			(0.0f)
 #define UKF_EST_STATE_ENTRY_2_INIT_VALUE			(0.0f)
