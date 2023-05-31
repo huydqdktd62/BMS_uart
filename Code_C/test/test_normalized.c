@@ -36,7 +36,7 @@ static int32_t create_est_data(const char *file_path, FILE *out_file) {
 		printf("Error! Could not write to file\n");
 		return -1;
 	}
-	fprintf(out_file, "test_circle,state 0, state 1, state 2, state 3, state 4, state 5, state 6,SOC,SOC_f,");
+	fprintf(out_file, "test_circle,state INIT, state IDLE, state UKF, state CLB COUNTER, state CALIB, state SLEEP, state FAIL, SOC, SOC_f,");
 	fprintf(out_file, "terminalVoltage,current,");
 	fprintf(out_file, "H_param,");
 	fprintf(out_file, "a_est_state1,a_est_state2,a_est_state3,");
@@ -139,15 +139,17 @@ int hal_entry(void) {
 	create_est_data(output_ocv_data_file, out_file);
 	bms_soc.input.pack_voltage = input_vector[0].terminalVoltage;
 	bms_soc.input.pack_current = input_vector[0].current;
-	load_soc(&bms_soc, 100.0f*get_soc_from_ocv((float)bms_soc.input.pack_voltage/PACK_VOLTAGE_NORMALIZED_GAIN));
-	ukf_parameters_create(&soc_parameter);
-	ukf_init(&bms_soc);
-	ukf_update(&bms_soc, 1.0f);
+
+    ukf_parameters_create(&soc_parameter);
+    bms_soc.battery_model = &LG_Model;
+	load_soc(&bms_soc, 100.0f * model_get_soc_from_ocv(bms_soc.battery_model,
+							(float) bms_soc.input.pack_voltage / PACK_VOLTAGE_NORMALIZED_GAIN));
+    ukf_init(&bms_soc, 100);
 	for (int i = 0; i < sample_size; i++) {
 		bms_soc.input.pack_voltage = input_vector[i].terminalVoltage;
 		bms_soc.input.pack_current = input_vector[i].current;
 		for (int j = 0; j < SOC_PERIOD; j++) {
-			ukf_update(&bms_soc, 1.0f);
+		    ukf_update(&bms_soc);
 			switch (bms_soc.state) {
 				case SOC_ST_INIT:
 					state_entries[SOC_ST_INIT] = 1;

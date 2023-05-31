@@ -48,6 +48,8 @@ typedef struct SOC_Filter_t SOC_Filter;
 struct SOC_Filter_t {
 	uint32_t total_pack_voltage;
 	int32_t total_pack_current;
+	uint32_t last_pack_voltage;
+	int32_t last_pack_current;
 	uint32_t avg_pack_voltage;
 	int32_t avg_pack_current;
 	uint32_t avg_cnt;
@@ -60,6 +62,10 @@ struct SOC_UKF_t {
 	SOC_State state;
 	SOC_Filter filter;
 	SOC_err err;
+	Battery_Model* battery_model;
+	uint32_t soc_update_cnt_10ms;
+	uint32_t soc_sleep_cnt_10ms;
+	float soh;
 };
 
 typedef struct SOC_Parameter_t SOC_Parameter;
@@ -101,8 +107,8 @@ struct SOC_Parameter_t {
 
 void ukf_parameters_create(SOC_Parameter* parameter);
 void load_soc(SOC_UKF *battery_soc, const float soc);
-void ukf_init(SOC_UKF* battery_soc);
-uint8_t ukf_update(SOC_UKF *battery_soc, const float soh);
+void ukf_init(SOC_UKF* battery_soc, const uint8_t soh);
+uint8_t ukf_update(SOC_UKF *battery_soc);
 
 extern SOC_UKF bms_soc;
 extern SOC_Parameter soc_parameter;
