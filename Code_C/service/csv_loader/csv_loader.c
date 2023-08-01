@@ -208,21 +208,65 @@ int32_t load_battery_data_from_csv_file(const char* path,BMS_Input_Vector *buff,
 }
 #endif
 
-int32_t load_soh_data_from_csv_file(const char* path, float *buff,const uint32_t max_size){
+int32_t load_soh_data_from_csv_file(const char* path, SOH_Save_Data *buff,const uint32_t max_size){
     FILE* stream = fopen(path, "r");
     if(NULL==stream){
     	return -1;
     }
     uint32_t line_id=0;
     char line[1024];
+    int32_t index;
     const char* field;
     while (fgets(line, 1024, stream))
     {
+		index = 1;
         char* tmp;
         tmp = strdup(line);
-        field=getfield(tmp, 1);
+        field=getfield(tmp, index++);
         if(NULL==field) return -1;
-        buff[line_id]= (float)atof(field);
+        buff[line_id].c1= (int64_t)atof(field);
+        free(tmp);
+
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].c2= (int64_t)atof(field);
+        free(tmp);
+
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].c3= (int64_t)atof(field);
+        free(tmp);
+
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].delta_x= (int64_t)atof(field);
+        free(tmp);
+
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].delta_y= (int64_t)atof(field);
+        free(tmp);
+
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].est_capacity= (int64_t)atof(field);
+        free(tmp);
+
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].last_soc= (int64_t)atof(field);
+        free(tmp);
+
+        tmp = strdup(line);
+        field=getfield(tmp, index++);
+        if(NULL==field) return -1;
+        buff[line_id].soh= (int64_t)atof(field);
         free(tmp);
 
     	line_id++;

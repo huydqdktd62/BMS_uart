@@ -137,23 +137,18 @@ static Matrix m_update_state = {.row = UKF_STATE_DIM, .col = 1};
 static Matrix t_update_state_cov = {.row = 1, .col = UKF_STATE_DIM};
 static Matrix m_update_state_cov = {.row = UKF_STATE_DIM, .col = UKF_STATE_DIM};
 
-Battery_param battery_param;
-static uint32_t soc_update_cnt_10ms = 1;
-static uint32_t soc_sleep_cnt_10ms = 0;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
 
 
-static void entries_init(SOC_UKF* battery_soc, const float soh);
+static void entries_init(SOC_UKF* battery_soc);
 
-static void check_calib_condition(SOC_UKF* battery_soc);
-static void soc_calib(SOC_UKF* battery_soc, const float soh);
+static void soc_calib(SOC_UKF* battery_soc);
 static void soc_update_filter(SOC_UKF* battery_soc);
-static void soc_update_ukf(SOC_UKF* battery_soc, const float soh);
-static void soc_update_coulomb_counter(SOC_UKF* battery_soc, const float soh);
+static void soc_update_ukf(SOC_UKF* battery_soc);
+static void soc_update_coulomb_counter(SOC_UKF* battery_soc);
 static void soc_set_state(SOC_UKF* battery_soc, const SOC_State soc_state);
 static inline SOC_State soc_get_state(const SOC_UKF *const battery_soc);
 
@@ -161,28 +156,32 @@ void load_soc(SOC_UKF* battery_soc, const float soc){
     battery_soc->output.SOC_f = soc;
 }
 
-void ukf_init(SOC_UKF* battery_soc) {
+void ukf_init(SOC_UKF* battery_soc, const uint8_t soh) {
+	battery_soc->soh = (float)soh/100.0f;
 	battery_soc->filter.total_pack_voltage = 0;
 	battery_soc->filter.total_pack_current = 0;
+
 	battery_soc->filter.avg_pack_voltage = battery_soc->input.pack_voltage;
 	battery_soc->filter.avg_pack_current = battery_soc->input.pack_current;
+	battery_soc->filter.last_pack_voltage = battery_soc->input.pack_voltage;
+	battery_soc->filter.last_pack_current = battery_soc->input.pack_current;
 	battery_soc->filter.avg_cnt = 0;
 
 	battery_soc->output.SOC = (uint32_t) roundf((float)battery_soc->output.SOC_f);
 
 	soc_set_state(battery_soc, SOC_ST_INIT);
+	soc_set_state(battery_soc, SOC_ST_IDLE);
 	battery_soc->err = SOC_SUCCESS;
 }
 
-uint8_t ukf_update(SOC_UKF* battery_soc, const float soh) {
+uint8_t ukf_update(SOC_UKF *battery_soc) {
+	battery_soc->soc_update_cnt_10ms++;
 	soc_update_filter(battery_soc);
-	check_calib_condition(battery_soc);
 	switch (soc_get_state(battery_soc)) {
 	case SOC_ST_INIT:
-		entries_init(battery_soc, soh);
 		if (absolute_f(
 				battery_soc->output.SOC_f
-						- get_soc_from_ocv(
+						- model_get_soc_from_ocv(battery_soc->battery_model,
 								(float) battery_soc->input.pack_voltage
 										/ PACK_VOLTAGE_NORMALIZED_GAIN)
 								* SOC_NORMALIZED_GAIN)>UKF_SOC_MAX_ERROR_percent) {
@@ -193,33 +192,46 @@ uint8_t ukf_update(SOC_UKF* battery_soc, const float soh) {
 		break;
 	case SOC_ST_UKF:
 		soc_set_state(battery_soc, SOC_ST_IDLE);
-		if (estimate_state.entries[0]
-				< UKF_LOWER_EST_STATE_THRESHOLD
-				&& battery_soc->input.pack_current
-						< UKF_LOWER_CURRENT_THRESHOLD) {
-			break;
-		}
-		soc_update_ukf(battery_soc, soh);
 		break;
 	case SOC_ST_COULOMB_COUNTER:
 		soc_set_state(battery_soc, SOC_ST_IDLE);
-		if (estimate_state.entries[0]
-				> COULOMBCOUNTER_UPPER_EST_STATE_THRESHOLD)
-			break;
-		soc_update_coulomb_counter(battery_soc, soh);
 		break;
 	case SOC_ST_CALIB:
-		soc_calib(battery_soc, soh);
-		entries_init(battery_soc, soh);
 		soc_set_state(battery_soc, SOC_ST_SLEEP);
 		break;
 	case SOC_ST_SLEEP:
+		battery_soc->soc_update_cnt_10ms = 0;
 		if (absolute_f((float) battery_soc->input.pack_current)
 				> UKF_SLEEP_CURRENT_THRESHOLD) {
 			soc_set_state(battery_soc, SOC_ST_IDLE);
 		}
-		break;
+		//no break
 	case SOC_ST_IDLE:
+		if (absolute_f((float) battery_soc->input.pack_current)
+				< UKF_CALIB_CURRENT_THRESHOLD) {
+			battery_soc->soc_sleep_cnt_10ms++;
+		}
+		if (absolute_f((float) battery_soc->input.pack_current)
+				> UKF_CALIB_CURRENT_THRESHOLD) {
+			battery_soc->soc_sleep_cnt_10ms = 0;
+		}
+		if (battery_soc->soc_sleep_cnt_10ms == CNT_3_MINUTE_10mS) {
+			battery_soc->soc_sleep_cnt_10ms = 0;
+			soc_set_state(battery_soc, SOC_ST_CALIB);
+			break;
+		}
+		if (battery_soc->soc_update_cnt_10ms >= SOC_PERIOD) {
+			if (battery_soc->input.pack_voltage > COULOMBCOUNTER_VOLTAGE_THRESHOLD
+					&& battery_soc->input.pack_current
+							> COULOMBCOUNTER_LOWER_CURRENT_THRESHOLD
+					&& battery_soc->input.pack_current
+							< COULOMBCOUNTER_UPPER_CURRENT_THRESHOLD){
+				soc_set_state(battery_soc, SOC_ST_COULOMB_COUNTER);
+			}else{
+				soc_set_state(battery_soc, SOC_ST_UKF);
+			}
+			battery_soc->soc_update_cnt_10ms = 1;
+		}
 		break;
 	case SOC_ST_FAULT:
 		soc_set_state(battery_soc, SOC_ST_INIT);
@@ -233,49 +245,46 @@ uint8_t ukf_update(SOC_UKF* battery_soc, const float soh) {
     if(battery_soc->output.SOC > BMS_SOC_UPPER_LIMIT){
     	battery_soc->output.SOC = BMS_SOC_UPPER_LIMIT;
     }
-
-	switch (soc_get_state(battery_soc)) {
-	case SOC_ST_IDLE:
-		if (soc_update_cnt_10ms++ == SOC_PERIOD) {
-			soc_update_cnt_10ms = 1;
-			soc_set_state(battery_soc, SOC_ST_UKF);
-			if (battery_soc->input.pack_voltage
-					> COULOMBCOUNTER_VOLTAGE_THRESHOLD
-					&& battery_soc->input.pack_current
-							> COULOMBCOUNTER_LOWER_CURRENT_THRESHOLD
-					&& battery_soc->input.pack_current
-							< COULOMBCOUNTER_UPPER_CURRENT_THRESHOLD)
-				soc_set_state(battery_soc, SOC_ST_COULOMB_COUNTER);
-		}
-		break;
-	case SOC_ST_INIT:
-	case SOC_ST_UKF:
-	case SOC_ST_COULOMB_COUNTER:
-	case SOC_ST_CALIB:
-	case SOC_ST_SLEEP:
-	case SOC_ST_FAULT:
-		break;
-	default:
-		soc_set_state(battery_soc, SOC_ST_INIT);
-		return SOC_FAIL;
-	}
-
 	return SOC_SUCCESS;
 }
 
-static void check_calib_condition(SOC_UKF* battery_soc){
-	if (absolute_f((float) battery_soc->input.pack_current)
-			< UKF_CALIB_CURRENT_THRESHOLD) {
-		soc_sleep_cnt_10ms++;
+void soc_set_state(SOC_UKF* battery_soc, const SOC_State soc_state){
+	switch (soc_state) {
+	case SOC_ST_INIT:
+		entries_init(battery_soc);
+		break;
+	case SOC_ST_UKF:
+		if (estimate_state.entries[0]
+				< UKF_LOWER_EST_STATE_THRESHOLD
+				&& battery_soc->input.pack_current
+						< UKF_LOWER_CURRENT_THRESHOLD) {
+			break;
+		}
+		soc_update_ukf(battery_soc);
+		break;
+	case SOC_ST_COULOMB_COUNTER:
+		if (estimate_state.entries[0]
+				> COULOMBCOUNTER_UPPER_EST_STATE_THRESHOLD)
+			break;
+		soc_update_coulomb_counter(battery_soc);
+		break;
+	case SOC_ST_CALIB:
+		soc_calib(battery_soc);
+		entries_init(battery_soc);
+		break;
+	case SOC_ST_SLEEP:
+		break;
+	case SOC_ST_IDLE:
+		break;
+	case SOC_ST_FAULT:
+		break;
+	default:
+		break;
 	}
-	if (absolute_f((float) battery_soc->input.pack_current)
-			> UKF_CALIB_CURRENT_THRESHOLD) {
-		soc_sleep_cnt_10ms = 0;
-	}
-	if (soc_sleep_cnt_10ms == CNT_3_MINUTE_10mS) {
-		soc_sleep_cnt_10ms = 0;
-		soc_set_state(battery_soc, SOC_ST_CALIB);
-	}
+	battery_soc->state = soc_state;
+}
+static inline SOC_State soc_get_state(const SOC_UKF *const battery_soc){
+	return battery_soc->state;
 }
 
 void ukf_parameters_create(SOC_Parameter* parameter){
@@ -300,9 +309,9 @@ void ukf_parameters_create(SOC_Parameter* parameter){
 	H_param = &parameter->H_param;
 	cell_voltage = &parameter->cell_voltage;
 	cell_current = &parameter->cell_current;
-	g1_create_sigma_point.entries = &parameter->g1_create_sigma_point_entries[0];
-	g2_create_sigma_point.entries = &parameter->g2_create_sigma_point_entries[0];
-	m_update_sigma_state.entries = &parameter->m_update_sigma_state_entries[0];
+	g1_create_sigma_point.entries = parameter->g1_create_sigma_point_entries;
+	g2_create_sigma_point.entries = parameter->g2_create_sigma_point_entries;
+	m_update_sigma_state.entries = parameter->m_update_sigma_state_entries;
 	g_update_sigma_state.entries = &parameter->g_update_sigma_state_entries[0];
 	m1_update_state_cov.entries = &parameter->m1_time_update_state_covariance_entries[0];
 	m2_update_state_cov.entries = &parameter->m2_time_update_state_covariance_entries[0];
@@ -315,12 +324,14 @@ void ukf_parameters_create(SOC_Parameter* parameter){
 	m_update_state_cov.entries = &parameter->m_update_state_covariance_entries[0];
 }
 
-static void entries_init(SOC_UKF* battery_soc, __attribute__((unused)) const float soh){
+static void entries_init(SOC_UKF* battery_soc){
 	uint8_t i;
 
-	battery_param.R0 = UKF_R0_INIT_Omh;
-	battery_param.R1 = UKF_R1_INIT_Omh;
-	battery_param.C1 = UKF_C1_INIT_F;
+	battery_soc->soc_update_cnt_10ms = 1;
+	battery_soc->soc_sleep_cnt_10ms = 0;
+	battery_soc->battery_model->R0 = UKF_R0_INIT_Omh;
+	battery_soc->battery_model->R1 = UKF_R1_INIT_Omh;
+	battery_soc->battery_model->C1 = UKF_C1_INIT_F;
 	*cell_voltage = (float)battery_soc->input.pack_voltage/PACK_VOLTAGE_NORMALIZED_GAIN;
 
 	estimate_state.entries[0] = battery_soc->output.SOC_f/SOC_NORMALIZED_GAIN;
@@ -374,13 +385,23 @@ static void soc_update_filter(SOC_UKF* battery_soc){
 		battery_soc->filter.total_pack_current = 0;
 		battery_soc->filter.avg_cnt = 0;
 	}
-	battery_soc->filter.total_pack_voltage += battery_soc->input.pack_voltage;
-	battery_soc->filter.total_pack_current += battery_soc->input.pack_current;
-	battery_soc->filter.avg_cnt++;
+	if (battery_soc->input.pack_voltage > BATTERY_UPPER_VOLTAGE_THRESHOLD
+			|| battery_soc->input.pack_voltage < BATTERY_LOWER_VOLTAGE_THRESHOLD){
+		battery_soc->filter.total_pack_voltage += battery_soc->filter.last_pack_voltage;
+		battery_soc->filter.total_pack_current += battery_soc->filter.last_pack_current;
+		battery_soc->filter.avg_cnt++;
+	}else{
+		battery_soc->filter.last_pack_voltage = battery_soc->input.pack_voltage;
+		battery_soc->filter.last_pack_current = battery_soc->input.pack_current;
+		battery_soc->filter.total_pack_voltage += battery_soc->input.pack_voltage;
+		battery_soc->filter.total_pack_current += battery_soc->input.pack_current;
+		battery_soc->filter.avg_cnt++;
+	}
+
 
 }
 
-static void soc_update_ukf(SOC_UKF* battery_soc, const float soh){
+static void soc_update_ukf(SOC_UKF* battery_soc){
 	uint8_t i,j,k;
     int32_t r,c;
 
@@ -512,11 +533,11 @@ static void soc_update_ukf(SOC_UKF* battery_soc, const float soh){
 	if (*cell_current < ZERO) {
 		*eta = UKF_CHARGE_ETA_RATIO;
 	}
-	*RC_param = exponent_f(-absolute_f((float)UKF_SAMPLE_TIME_s / (battery_param.R1*battery_param.C1)));
+	*RC_param = exponent_f(-absolute_f((float)UKF_SAMPLE_TIME_s / (battery_soc->battery_model->R1*battery_soc->battery_model->C1)));
 	*H_param = exponent_f(
 			-(absolute_f(
 					(float) (*eta * UKF_CAPACITY_RATIO * UKF_SAMPLE_TIME_s * *cell_current
-							/ (soh * UKF_NOMIMAL_CAPACITY_AS)))));
+							/ (battery_soc->soh * UKF_NOMIMAL_CAPACITY_AS)))));
 
 //	aukf_update_matrix_a();
 	Matrix_A.entries[4] = *RC_param;
@@ -524,7 +545,7 @@ static void soc_update_ukf(SOC_UKF* battery_soc, const float soh){
 
 //	aukf_update_matrix_b();
 	Matrix_B.entries[0] = -(*eta * (float)UKF_SAMPLE_TIME_s)
-			/ (soh * UKF_NOMIMAL_CAPACITY_AS);
+			/ (battery_soc->soh * UKF_NOMIMAL_CAPACITY_AS);
 	Matrix_B.entries[2] = ONE - *RC_param;
 	Matrix_B.entries[5] = *H_param - ONE;
 
@@ -539,13 +560,13 @@ static void soc_update_ukf(SOC_UKF* battery_soc, const float soh){
 
 	float d[UKF_SIGMA_FACTOR] = {ZERO};
 	for (i = 0; i < UKF_SIGMA_FACTOR; i++) {
-		d[i] = get_ratio_from_soc(sigma_points.entries[i]);
+		d[i] = model_get_ratio_from_soc(battery_soc->battery_model, sigma_points.entries[i]);
 	}
 	Matrix_C.entries[0] = (d[0]+d[1]+d[2]+d[3]+d[4]+d[5]+d[6]) / UKF_SIGMA_FACTOR;
-	Matrix_C.entries[1] = -battery_param.R1;
+	Matrix_C.entries[1] = -battery_soc->battery_model->R1;
 
 //	aukf_update_matrix_d();
-	Matrix_D.entries[0] = -battery_param.R0;
+	Matrix_D.entries[0] = -battery_soc->battery_model->R0;
 
 //	aukf_time_update_sigma_measurements();
 	multiply(Matrix_C, sigma_points, sigma_measurements);
@@ -679,23 +700,16 @@ static void soc_update_ukf(SOC_UKF* battery_soc, const float soh){
 	minus(state_covariance, m_update_state_cov, state_covariance);
 }
 
-static void soc_calib(SOC_UKF* battery_soc, __attribute__((unused)) const float soh){
-	battery_soc->output.SOC_f = 100.0f*get_soc_from_ocv(
-			(float) battery_soc->input.pack_voltage / PACK_VOLTAGE_NORMALIZED_GAIN);
+static void soc_calib(SOC_UKF* battery_soc){
+	battery_soc->output.SOC_f = 100.0f * model_get_soc_from_ocv(
+			battery_soc->battery_model, (float) battery_soc->input.pack_voltage / PACK_VOLTAGE_NORMALIZED_GAIN);
 	estimate_state.entries[2] = UKF_EST_STATE_ENTRY_2_INIT_VALUE;
 }
 
-static void soc_update_coulomb_counter(SOC_UKF* battery_soc,__attribute__((unused)) const float soh){
-	estimate_state.entries[0] -= ((float)battery_soc->filter.avg_pack_current*UKF_SAMPLE_TIME_s)/(PACK_CURRENT_NORMALIZED_GAIN*UKF_NOMIMAL_CAPACITY_AS);
+static void soc_update_coulomb_counter(SOC_UKF* battery_soc){
+	estimate_state.entries[0] -= ((float)battery_soc->filter.avg_pack_current*UKF_SAMPLE_TIME_s)/(battery_soc->soh * PACK_CURRENT_NORMALIZED_GAIN*UKF_NOMIMAL_CAPACITY_AS);
 	if(estimate_state.entries[0]>UKF_EST_STATE_ENTRY_0_UPPER_LIMIT){
 		estimate_state.entries[0] =UKF_EST_STATE_ENTRY_0_UPPER_LIMIT;
 	}
-}
-
-void soc_set_state(SOC_UKF* battery_soc, const SOC_State soc_state){
-	battery_soc->state = soc_state;
-}
-static inline SOC_State soc_get_state(const SOC_UKF *const battery_soc){
-	return battery_soc->state;
 }
 /* USER CODE END PFP */

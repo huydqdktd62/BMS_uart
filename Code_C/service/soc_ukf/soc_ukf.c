@@ -145,7 +145,6 @@ static Matrix m_update_state_cov = {.row = UKF_STATE_DIM, .col = UKF_STATE_DIM};
 
 static void entries_init(SOC_UKF* battery_soc);
 
-//static void check_calib_condition(SOC_UKF* battery_soc);
 static void soc_calib(SOC_UKF* battery_soc);
 static void soc_update_filter(SOC_UKF* battery_soc);
 static void soc_update_ukf(SOC_UKF* battery_soc);
@@ -178,7 +177,6 @@ void ukf_init(SOC_UKF* battery_soc, const uint8_t soh) {
 uint8_t ukf_update(SOC_UKF *battery_soc) {
 	battery_soc->soc_update_cnt_10ms++;
 	soc_update_filter(battery_soc);
-//	check_calib_condition(battery_soc);
 	switch (soc_get_state(battery_soc)) {
 	case SOC_ST_INIT:
 		if (absolute_f(
@@ -202,11 +200,12 @@ uint8_t ukf_update(SOC_UKF *battery_soc) {
 		soc_set_state(battery_soc, SOC_ST_SLEEP);
 		break;
 	case SOC_ST_SLEEP:
+		battery_soc->soc_update_cnt_10ms = 0;
 		if (absolute_f((float) battery_soc->input.pack_current)
 				> UKF_SLEEP_CURRENT_THRESHOLD) {
 			soc_set_state(battery_soc, SOC_ST_IDLE);
 		}
-		break;
+		//no break
 	case SOC_ST_IDLE:
 		if (absolute_f((float) battery_soc->input.pack_current)
 				< UKF_CALIB_CURRENT_THRESHOLD) {
@@ -231,7 +230,7 @@ uint8_t ukf_update(SOC_UKF *battery_soc) {
 			}else{
 				soc_set_state(battery_soc, SOC_ST_UKF);
 			}
-			battery_soc->soc_update_cnt_10ms = 1;
+			battery_soc->soc_update_cnt_10ms = 0;
 		}
 		break;
 	case SOC_ST_FAULT:
@@ -249,20 +248,44 @@ uint8_t ukf_update(SOC_UKF *battery_soc) {
 	return SOC_SUCCESS;
 }
 
-//static void check_calib_condition(SOC_UKF* battery_soc){
-//	if (absolute_f((float) battery_soc->input.pack_current)
-//			< UKF_CALIB_CURRENT_THRESHOLD) {
-//		battery_soc->soc_sleep_cnt_10ms++;
-//	}
-//	if (absolute_f((float) battery_soc->input.pack_current)
-//			> UKF_CALIB_CURRENT_THRESHOLD) {
-//		battery_soc->soc_sleep_cnt_10ms = 0;
-//	}
-//	if (battery_soc->soc_sleep_cnt_10ms == CNT_3_MINUTE_10mS) {
-//		battery_soc->soc_sleep_cnt_10ms = 0;
-//		soc_set_state(battery_soc, SOC_ST_CALIB);
-//	}
-//}
+void soc_set_state(SOC_UKF* battery_soc, const SOC_State soc_state){
+	switch (soc_state) {
+	case SOC_ST_INIT:
+		entries_init(battery_soc);
+		break;
+	case SOC_ST_UKF:
+		if (estimate_state.entries[0]
+				< UKF_LOWER_EST_STATE_THRESHOLD
+				&& battery_soc->input.pack_current
+						< UKF_LOWER_CURRENT_THRESHOLD) {
+			break;
+		}
+		soc_update_ukf(battery_soc);
+		break;
+	case SOC_ST_COULOMB_COUNTER:
+		if (estimate_state.entries[0]
+				> COULOMBCOUNTER_UPPER_EST_STATE_THRESHOLD)
+			break;
+		soc_update_coulomb_counter(battery_soc);
+		break;
+	case SOC_ST_CALIB:
+		soc_calib(battery_soc);
+		entries_init(battery_soc);
+		break;
+	case SOC_ST_SLEEP:
+		break;
+	case SOC_ST_IDLE:
+		break;
+	case SOC_ST_FAULT:
+		break;
+	default:
+		break;
+	}
+	battery_soc->state = soc_state;
+}
+static inline SOC_State soc_get_state(const SOC_UKF *const battery_soc){
+	return battery_soc->state;
+}
 
 void ukf_parameters_create(SOC_Parameter* parameter){
 	estimate_state.entries = &parameter->estimate_state_entries[0];
@@ -688,44 +711,5 @@ static void soc_update_coulomb_counter(SOC_UKF* battery_soc){
 	if(estimate_state.entries[0]>UKF_EST_STATE_ENTRY_0_UPPER_LIMIT){
 		estimate_state.entries[0] =UKF_EST_STATE_ENTRY_0_UPPER_LIMIT;
 	}
-}
-
-void soc_set_state(SOC_UKF* battery_soc, const SOC_State soc_state){
-	switch (soc_state) {
-	case SOC_ST_INIT:
-		entries_init(battery_soc);
-		break;
-	case SOC_ST_UKF:
-		if (estimate_state.entries[0]
-				< UKF_LOWER_EST_STATE_THRESHOLD
-				&& battery_soc->input.pack_current
-						< UKF_LOWER_CURRENT_THRESHOLD) {
-			break;
-		}
-		soc_update_ukf(battery_soc);
-		break;
-	case SOC_ST_COULOMB_COUNTER:
-		if (estimate_state.entries[0]
-				> COULOMBCOUNTER_UPPER_EST_STATE_THRESHOLD)
-			break;
-		soc_update_coulomb_counter(battery_soc);
-		break;
-	case SOC_ST_CALIB:
-		soc_calib(battery_soc);
-		entries_init(battery_soc);
-		break;
-	case SOC_ST_SLEEP:
-		break;
-	case SOC_ST_IDLE:
-		break;
-	case SOC_ST_FAULT:
-		break;
-	default:
-		break;
-	}
-	battery_soc->state = soc_state;
-}
-static inline SOC_State soc_get_state(const SOC_UKF *const battery_soc){
-	return battery_soc->state;
 }
 /* USER CODE END PFP */

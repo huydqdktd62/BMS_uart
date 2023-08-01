@@ -11,6 +11,7 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include src/test/subdir.mk
+-include src/service/soh_lsb/subdir.mk
 -include src/service/soc_ukf/subdir.mk
 -include src/service/retaget/subdir.mk
 -include src/service/modbus/rtu/subdir.mk

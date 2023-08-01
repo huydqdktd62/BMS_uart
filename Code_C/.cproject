@@ -30,6 +30,7 @@
 								<option defaultValue="gnu.c.debugging.level.max" id="gnu.c.compiler.mingw.exe.debug.option.debugging.level.844057758" name="Debug Level" superClass="gnu.c.compiler.mingw.exe.debug.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.c.compiler.option.include.paths.756115454" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/service/csv_loader}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/service/soh_lsb}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/service/soc_ukf}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/util/math}&quot;"/>
 								</option>
@@ -45,8 +46,11 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.1366927885" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="cdt.managedbuild.config.gnu.mingw.exe.debug.841946990.1322982232" name="test_soh.c" rcbsApplicability="disable" resourcePath="test/test_soh.c" toolsToInvoke="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1497719554.1393439078">
+						<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1497719554.1393439078" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.1497719554"/>
+					</fileInfo>
 					<sourceEntries>
-						<entry excluding="service/soc_ukf_normalized|test/test_matrix.c|service/app_config|service/data_logger|service/normalize|test/test_refactor.c|test/test_soc_v2.c|service/soc_ukf_refactor|service/soc_aukf|service/magic_number" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="test/test_normalized.c|service/soc_ukf_normalized|test/test_matrix.c|service/app_config|service/data_logger|service/normalize|test/test_refactor.c|test/test_soc_v2.c|service/soc_ukf_refactor|service/soc_aukf|service/magic_number" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

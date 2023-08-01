@@ -15,7 +15,7 @@
 
 #define CNT_10_MINUTE_10mS							(60000)
 #define CNT_3_MINUTE_10mS							(18000)
-#define APP_STATE_MACHINE_UPDATE_TICK_mS			(10)
+#define APP_STATE_MACHINE_UPDATE_TICK_mS			(100)
 
 /*
  * Dimensional parameters...
@@ -33,7 +33,7 @@
 #define UKF_R1_INIT_Omh								(0.0303f)
 #define UKF_C1_INIT_F								(float)(25.8403f*UKF_SAMPLE_TIME_s)
 #define UKF_GAMMA_RATIO								(0.017320508f)
-#define UKF_NOMIMAL_CAPACITY_AS						(17280.0f)//LG cell 17280, Molicel 14400
+#define UKF_NOMIMAL_CAPACITY_AS						(14400.0f)//LG cell 17280 15552.0f, Molicel 14400
 #define UKF_CHARGE_ETA_RATIO						(1.0f)
 #define UKF_DISCHARGE_ETA_RATIO						(1.03092783505f)
 #define UKF_HYSTERESIS_V							(0.062f)
@@ -47,7 +47,7 @@
  * UKF Algorithm parameters...
  */
 #define SOC_NORMALIZED_GAIN							(100.0f)
-#define SOC_PERIOD									(50)
+#define SOC_PERIOD									(10)
 #define UKF_DEFAULT_MEASUREMENT_COVARIANCE			(0.0472f)
 #define UKF_SOC_MAX_ERROR_percent					(10.0f)
 #define UKF_SAMPLE_TIME_s							((float)(APP_STATE_MACHINE_UPDATE_TICK_mS*SOC_PERIOD)*0.001f)
@@ -64,6 +64,8 @@
 #define UKF_EST_STATE_ENTRY_2_LOWER_LIMIT			(-1.0f)
 #define BMS_SOC_UPPER_LIMIT							(100)
 
+#define BATTERY_UPPER_VOLTAGE_THRESHOLD				(70000)
+#define BATTERY_LOWER_VOLTAGE_THRESHOLD				(45000)
 #define COULOMBCOUNTER_VOLTAGE_THRESHOLD			(66500)
 #define COULOMBCOUNTER_LOWER_CURRENT_THRESHOLD		(0)
 #define COULOMBCOUNTER_UPPER_CURRENT_THRESHOLD		(300)

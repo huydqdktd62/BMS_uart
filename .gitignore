@@ -136,3 +136,6 @@ Code C/Debug/main.o
 Code C/output.csv
 *.o
 *.d
+*.csv
+*.csv
+*.xlsx

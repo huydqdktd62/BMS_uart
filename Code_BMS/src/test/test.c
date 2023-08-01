@@ -15,6 +15,7 @@
 #include "service/soc_ukf/battery_model.h"
 #include "math.h"
 #include "stdio.h"
+#include "soh_lsb.h"
 
 volatile bool tx_complete = true;
 FIFO_Handle uart_rx_buff;
@@ -24,6 +25,7 @@ uint32_t len_handle = 0;
 fsp_err_t err;
 int32_t test_cycles = 1;
 SOC_Parameter soc_parameter;
+SOH_Estimator bms_soh;
 SOC_UKF bms_soc;
 
 void uart_write(const uint8_t *buff,uint32_t len);
@@ -39,32 +41,33 @@ void hal_entry(void)
     memset (buff_handle, 0, 512);
     len_handle = 0;
     fifo_init (&uart_rx_buff, 512, sizeof(char));
-    uart_print("test_circle,SOC,SOC_f,");
-    uart_print("terminalVoltage,current,");
-    uart_print("H_param,");
-    uart_print("a_est_state1,a_est_state2,a_est_state3,");
-
-    uart_print("a_state_cov1,a_state_cov2,a_state_cov3,");
-    uart_print("a_state_cov4,a_state_cov5,a_state_cov6,");
-    uart_print("a_state_cov7,a_state_cov8,a_state_cov9,");
-
-    uart_print("sig1_1,sig1_2,sig1_3,sig1_4,sig1_5,sig1_6,sig1_7,");
-    uart_print("sig2_1,sig2_2,sig2_3,sig2_4,sig2_5,sig2_6,sig2_7,");
-    uart_print("sig3_1,sig3_2,sig3_3,sig3_4,sig3_5,sig3_6,sig3_7,");
-    uart_print("pri_state1,pri_state2,pri_state3,");
-    uart_print("e_sig1_1,e_sig1_2,e_sig1_3,e_sig1_4,e_sig1_5,e_sig1_6,e_sig1_7,");
-    uart_print("e_sig2_1,e_sig2_2,e_sig2_3,e_sig2_4,e_sig2_5,e_sig2_6,e_sig2_7,");
-    uart_print("e_sig3_1,e_sig3_2,e_sig3_3,e_sig3_4,e_sig3_5,e_sig3_6,e_sig3_7,");
-    uart_print("measur_cov,est_measur,");
-    uart_print("a_cross1,a_cross2,a_cross3,");
-    uart_print("a_kal1,a_kal2,a_kal3,");
-    uart_print("A1,A2,A3,A4,A5,A6,A7,A8,A9,");
-    uart_print("B1,B2,B3,B4,B5,B6,");
-    uart_print("C1,C2,C3,");
-    uart_print("D1,D2,");
-    uart_print("I,sign(I),");
-    uart_print("sig_m1,sig_m2,sig_m3,sig_m4,sig_m5,sig_m6,sig_m7,");
-    uart_print("e_sig_m1,e_sig_m2,e_sig_m3,e_sig_m4,e_sig_m5,e_sig_m6,e_sig_m7");
+    uart_print("BMS_SOC,BMS_SOC_f,");
+    uart_print("SOH,SOH_f,");
+//    uart_print("terminalVoltage,current,");
+//    uart_print("H_param,");
+//    uart_print("a_est_state1,a_est_state2,a_est_state3,");
+//
+//    uart_print("a_state_cov1,a_state_cov2,a_state_cov3,");
+//    uart_print("a_state_cov4,a_state_cov5,a_state_cov6,");
+//    uart_print("a_state_cov7,a_state_cov8,a_state_cov9,");
+//
+//    uart_print("sig1_1,sig1_2,sig1_3,sig1_4,sig1_5,sig1_6,sig1_7,");
+//    uart_print("sig2_1,sig2_2,sig2_3,sig2_4,sig2_5,sig2_6,sig2_7,");
+//    uart_print("sig3_1,sig3_2,sig3_3,sig3_4,sig3_5,sig3_6,sig3_7,");
+//    uart_print("pri_state1,pri_state2,pri_state3,");
+//    uart_print("e_sig1_1,e_sig1_2,e_sig1_3,e_sig1_4,e_sig1_5,e_sig1_6,e_sig1_7,");
+//    uart_print("e_sig2_1,e_sig2_2,e_sig2_3,e_sig2_4,e_sig2_5,e_sig2_6,e_sig2_7,");
+//    uart_print("e_sig3_1,e_sig3_2,e_sig3_3,e_sig3_4,e_sig3_5,e_sig3_6,e_sig3_7,");
+//    uart_print("measur_cov,est_measur,");
+//    uart_print("a_cross1,a_cross2,a_cross3,");
+//    uart_print("a_kal1,a_kal2,a_kal3,");
+//    uart_print("A1,A2,A3,A4,A5,A6,A7,A8,A9,");
+//    uart_print("B1,B2,B3,B4,B5,B6,");
+//    uart_print("C1,C2,C3,");
+//    uart_print("D1,D2,");
+//    uart_print("I,sign(I),");
+//    uart_print("sig_m1,sig_m2,sig_m3,sig_m4,sig_m5,sig_m6,sig_m7,");
+//    uart_print("e_sig_m1,e_sig_m2,e_sig_m3,e_sig_m4,e_sig_m5,e_sig_m6,e_sig_m7");
 
     uart_print("\n");
 #if TEST_STR
@@ -140,59 +143,90 @@ int string_split(char* source,char* str,char *dest[]){
 }
 
 int init_flag = 0;
+int save_cnt = 0;
 
 void process_handle(char* buff, __attribute__((unused)) uint32_t len){
     string_split(buff,",",buff_soc);
     bms_soc.input.pack_voltage = (uint32_t)atoi(buff_soc[0]);
     bms_soc.input.pack_current = (int32_t)atoi(buff_soc[1]);
     if (init_flag == 0){
-        load_soc(&bms_soc, 100.0f*get_soc_from_ocv((float)bms_soc.input.pack_voltage/16000.0f));
         ukf_parameters_create(&soc_parameter);
-        ukf_init(&bms_soc);
-        ukf_update(&bms_soc, 1.0f);
+        bms_soc.battery_model = &LG_Model;
+        load_soc(&bms_soc, 100.0f * model_get_soc_from_ocv(bms_soc.battery_model,
+                                (float) bms_soc.input.pack_voltage / PACK_VOLTAGE_NORMALIZED_GAIN));
+        ukf_init(&bms_soc, 100);
+
+        bms_soh.c1 = 66.666667f;
+        bms_soh.c2 = 298.666667f;
+        bms_soh.c3 = 1338.027667f;
+        bms_soh.delta_x = 0.0f;
+        bms_soh.delta_y = 0.0f;
+        bms_soh.est_capacity = 4.32f;
+        bms_soh.last_soc = model_get_soc_from_ocv(bms_soc.battery_model,
+                                                  (float) bms_soc.input.pack_voltage / PACK_VOLTAGE_NORMALIZED_GAIN);
+        bms_soh.soh = 100.0f;
+
+        bms_soh_init(&bms_soh, bms_soh.last_soc);
+        bms_soc.soh = bms_soh.soh / 100.0f;
+
         init_flag = 1;
     }
     else{
+//        if(bms_soc.input.pack_voltage < 48000){
+//            bms_soc.input.pack_voltage = 48000;
+//        }
         for (int j = 0; j < SOC_PERIOD; j++) {
-             ukf_update(&bms_soc, 1.0f);
-         }
-        uart_print ("%d,", test_cycles++);
-        uart_print ("%d,%d,%d,%d,", bms_soc.output.SOC, (int32_t) (bms_soc.output.SOC_f * 1000000.0f),
-                    bms_soc.filter.avg_pack_voltage, bms_soc.filter.avg_pack_current);
-        uart_print ("%d,", (int32_t) (soc_parameter.H_param * 1000000.0f));
-        int i;
-        for (i = 0; i < 3; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.estimate_state_entries[i] * 1000000.0f));
-        for (i = 0; i < 9; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.state_covariance_entries[i] * 10000000000.0f));
-        for (i = 0; i < 21; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.sigma_points_entries[i] * 1000000.0f));
-        uart_print ("%d,%d,%d,", (int32_t) (soc_parameter.priori_estimate_state_entries[0] * 1000000.0f),
-                    (int32_t) (soc_parameter.priori_estimate_state_entries[1] * 1000000.0f),
-                    (int32_t) (soc_parameter.priori_estimate_state_entries[2] * 1000000.0f));
-        for (i = 0; i < 21; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.sigma_state_error_entries[i] * 1000000000.0f));
-        uart_print ("%d,%d,", (int32_t) (soc_parameter.measurement_cov * 1000000.0f),
-                    (int32_t) (soc_parameter.est_measurement * 1000000.0f));
-        for (i = 0; i < 3; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.cross_covariance_entries[i] * 1000000000.0f));
-        for (i = 0; i < 3; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.aukf_kalman_gain_entries[i] * 1000000000.0f));
-        for (i = 0; i < 9; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.matrix_A_entries[i] * 1000000.0f));
-        for (i = 0; i < 6; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.matrix_B_entries[i] * 1000000.0f));
-        for (i = 0; i < 3; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.matrix_C_entries[i] * 1000000.0f));
-        for (i = 0; i < 2; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.matrix_D_entries[i] * 1000000.0f));
-        uart_print ("%d,%d,", (int32_t) (soc_parameter.observed_measurement_entries[0] * 1000000.0f),
-                    (int32_t) (soc_parameter.observed_measurement_entries[1] * 1000000.0f));
-        for (i = 0; i < 7; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.sigma_measurements_entries[i] * 1000000.0f));
-        for (i = 0; i < 7; i++)
-            uart_print ("%d,", (int32_t) (soc_parameter.sigma_measurement_error_entries[i] * 1000000.0f));
-        uart_print ("\n");
+            ukf_update(&bms_soc);
+        }
+        bms_update_soh(&bms_soh, (bms_soc.output.SOC_f/100.0f), bms_soc.filter.avg_pack_current);
+        bms_soc.soh = bms_soh.soh / 100.0f;
+
+        save_cnt++;
+        if(save_cnt == 1200){
+            uart_print ("%d,%d,", bms_soc.output.SOC, (int32_t) (bms_soc.output.SOC_f * 10000.0f));
+            uart_print ("%d,%d,", (int32_t) bms_soh.soh, (int32_t) (bms_soh.soh * 100.0f));
+            save_cnt = 0;
+            uart_print ("\n");
+        }
+
+
+
+//        uart_print ("%d,", test_cycles++);
+//        uart_print ("%d,%d,%d,%d,", bms_soc.output.SOC, (int32_t) (bms_soc.output.SOC_f * 1000000.0f),
+//                    bms_soc.filter.avg_pack_voltage, bms_soc.filter.avg_pack_current);
+//        uart_print ("%d,", (int32_t) (soc_parameter.H_param * 1000000.0f));
+//        int i;
+//        for (i = 0; i < 3; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.estimate_state_entries[i] * 1000000.0f));
+//        for (i = 0; i < 9; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.state_covariance_entries[i] * 10000000000.0f));
+//        for (i = 0; i < 21; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.sigma_points_entries[i] * 1000000.0f));
+//        uart_print ("%d,%d,%d,", (int32_t) (soc_parameter.priori_estimate_state_entries[0] * 1000000.0f),
+//                    (int32_t) (soc_parameter.priori_estimate_state_entries[1] * 1000000.0f),
+//                    (int32_t) (soc_parameter.priori_estimate_state_entries[2] * 1000000.0f));
+//        for (i = 0; i < 21; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.sigma_state_error_entries[i] * 1000000000.0f));
+//        uart_print ("%d,%d,", (int32_t) (soc_parameter.measurement_cov * 1000000.0f),
+//                    (int32_t) (soc_parameter.est_measurement * 1000000.0f));
+//        for (i = 0; i < 3; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.cross_covariance_entries[i] * 1000000000.0f));
+//        for (i = 0; i < 3; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.aukf_kalman_gain_entries[i] * 1000000000.0f));
+//        for (i = 0; i < 9; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.matrix_A_entries[i] * 1000000.0f));
+//        for (i = 0; i < 6; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.matrix_B_entries[i] * 1000000.0f));
+//        for (i = 0; i < 3; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.matrix_C_entries[i] * 1000000.0f));
+//        for (i = 0; i < 2; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.matrix_D_entries[i] * 1000000.0f));
+//        uart_print ("%d,%d,", (int32_t) (soc_parameter.observed_measurement_entries[0] * 1000000.0f),
+//                    (int32_t) (soc_parameter.observed_measurement_entries[1] * 1000000.0f));
+//        for (i = 0; i < 7; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.sigma_measurements_entries[i] * 1000000.0f));
+//        for (i = 0; i < 7; i++)
+//            uart_print ("%d,", (int32_t) (soc_parameter.sigma_measurement_error_entries[i] * 1000000.0f));
     }
 }
 

@@ -110,7 +110,7 @@ void load_soc(SOC_UKF *battery_soc, const float soc);
 void ukf_init(SOC_UKF* battery_soc, const uint8_t soh);
 uint8_t ukf_update(SOC_UKF *battery_soc);
 
-extern SOC_UKF bms_soc;
-extern SOC_Parameter soc_parameter;
+//extern SOC_UKF bms_soc;
+//extern SOC_Parameter soc_parameter;
 
 #endif /* SERVICE_SOC_AUKF_SOC_UKF_H_ */

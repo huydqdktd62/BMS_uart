@@ -10,7 +10,7 @@
 #include "soc_ukf_config.h"
 
 
-#define INPUT_SAMPLE_SIZE				100000
+#define INPUT_SAMPLE_SIZE				1000000
 
 const char *data_file_path = "input.csv";
 const char *output_ocv_data_file = "normalized_output_BMS.csv";
@@ -36,7 +36,8 @@ static int32_t create_est_data(const char *file_path, FILE *out_file) {
 		printf("Error! Could not write to file\n");
 		return -1;
 	}
-	fprintf(out_file, "test_circle,state INIT, state IDLE, state UKF, state CLB COUNTER, state CALIB, state SLEEP, state FAIL, SOC, SOC_f,");
+	fprintf(out_file, "test_circle,state INIT, state IDLE, state UKF, state CLB COUNTER, state CALIB, state SLEEP, state FAIL, simulation_SOC, simulation_SOC_f,");
+
 	fprintf(out_file, "terminalVoltage,current,");
 	fprintf(out_file, "H_param,");
 	fprintf(out_file, "a_est_state1,a_est_state2,a_est_state3,");
@@ -67,6 +68,7 @@ static int32_t create_est_data(const char *file_path, FILE *out_file) {
 	fprintf(out_file,
 			"e_sig_m1,e_sig_m2,e_sig_m3,e_sig_m4,e_sig_m5,e_sig_m6,e_sig_m7");
 
+
 	fprintf(out_file, "\n");
 	fclose(out_file);
 	return 0;
@@ -81,8 +83,10 @@ static int32_t save_est_data(const char *file_path, const uint32_t pack_voltage,
 		fprintf(out_file, "%d,", state_entries[i]);
 		state_entries[i] = 0;
 	}
-	fprintf(out_file, "%d,%d,", bms_soc.output.SOC,(int32_t)(bms_soc.output.SOC_f*1000000.0f));
+	fprintf(out_file, "%d,%d,", bms_soc.output.SOC,(int32_t)(bms_soc.output.SOC_f*10000.0f));
 //	fprintf(out_file, "%d,%d,", bms_soc.input.pack_voltage,bms_soc.input.pack_current);
+
+
 	fprintf(out_file, "%d,%d,", bms_soc.filter.avg_pack_voltage, bms_soc.filter.avg_pack_current);
 	fprintf(out_file, "%d,", (int32_t)(soc_parameter.H_param*1000000.0f));
 
