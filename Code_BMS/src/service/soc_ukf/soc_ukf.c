@@ -29,14 +29,14 @@
 #if NORMALIZED_CODE
 #define NORMALIZED_PREDICT_STATE_IN_GAIN					(1000000000000.0f)
 #define NORMALIZED_PREDICT_STATE_OUT_GAIN					NORMALIZED_PREDICT_STATE_IN_GAIN
-#define NORMALIZED_STATE_COVARIANCE_IN_GAIN					(1000000000000.0f)
-#define NORMALIZED_STATE_COVARIANCE_OUT_GAIN				(NORMALIZED_STATE_COVARIANCE_IN_GAIN*NORMALIZED_STATE_COVARIANCE_IN_GAIN)
+#define NORMALIZED_STATE_COVARIANCE_IN_GAIN					(100000000.0f)
+#define NORMALIZED_STATE_COVARIANCE_OUT_GAIN				(NORMALIZED_STATE_COVARIANCE_IN_GAIN*NORMALIZED_STATE_COVARIANCE_IN_GAIN*10000.0f)
 #define NORMALIZED_PREDICT_MEASUREMENT_IN_GAIN				(1000000000.0f)
 #define NORMALIZED_PREDICT_MEASUREMENT_OUT_GAIN				NORMALIZED_PREDICT_MEASUREMENT_IN_GAIN
-#define NORMALIZED_MEASUREMENT_COVARIANCE_IN_GAIN			(1000000000.0f)
-#define NORMALIZED_MEASUREMENT_COVARIANCE_OUT_GAIN			(NORMALIZED_MEASUREMENT_COVARIANCE_IN_GAIN*NORMALIZED_MEASUREMENT_COVARIANCE_IN_GAIN)
-#define NORMALIZED_CROSS_COVARIANCE_IN_GAIN					(1000000000000.0f)
-#define NORMALIZED_CROSS_COVARIANCE_OUT_GAIN				(NORMALIZED_CROSS_COVARIANCE_IN_GAIN*NORMALIZED_CROSS_COVARIANCE_IN_GAIN)
+#define NORMALIZED_MEASUREMENT_COVARIANCE_IN_GAIN			(10000000.0f)
+#define NORMALIZED_MEASUREMENT_COVARIANCE_OUT_GAIN			(NORMALIZED_MEASUREMENT_COVARIANCE_IN_GAIN*NORMALIZED_MEASUREMENT_COVARIANCE_IN_GAIN*10000.0f)
+#define NORMALIZED_CROSS_COVARIANCE_IN_GAIN					(1000000000.0f)
+#define NORMALIZED_CROSS_COVARIANCE_OUT_GAIN				(NORMALIZED_CROSS_COVARIANCE_IN_GAIN*NORMALIZED_CROSS_COVARIANCE_IN_GAIN*10000.0f)
 static int64_t priori_est_state_64_bit[UKF_STATE_DIM];
 static int64_t sigma_point_64_bit[UKF_STATE_DIM * UKF_SIGMA_FACTOR];
 static const int64_t m_weight_64_bit[UKF_SIGMA_FACTOR] = {     -2999,
@@ -63,13 +63,13 @@ static const int64_t c_weight_64_bit[UKF_SIGMA_FACTOR] = {
 		5000000
 };
 
-static const int64_t default_measurement_covariance_64_bit = 447200000000;
+static const int64_t default_measurement_covariance_64_bit = 44720000000000000;
 static int64_t measurement_covariance_64_bit;
 
 static const int64_t default_system_covariance_64_bit[UKF_STATE_DIM * UKF_STATE_DIM] = {
-		1000000, 0, 0,
-		0, 10000, 0,
-		0, 0, 200000000
+        100000000000000, 0, 0,
+		0, 1000000000000, 0,
+		0, 0, 20000000000000000
 };
 static int64_t state_covariance_64_bit[UKF_STATE_DIM * UKF_STATE_DIM];
 #else
@@ -230,7 +230,7 @@ uint8_t ukf_update(SOC_UKF *battery_soc) {
 			}else{
 				soc_set_state(battery_soc, SOC_ST_UKF);
 			}
-			battery_soc->soc_update_cnt_10ms = 1;
+			battery_soc->soc_update_cnt_10ms = 0;
 		}
 		break;
 	case SOC_ST_FAULT:
@@ -550,14 +550,6 @@ static void soc_update_ukf(SOC_UKF* battery_soc){
 	Matrix_B.entries[5] = *H_param - ONE;
 
 //	aukf_update_matrix_c();
-
-//	float d = 0.0f;
-//	for (i = 0; i < SIGMA_FACTOR; i++) {
-//		d += get_ratio_from_soc(sigma_points.entries[i]);
-//	}
-//	matrix_C.entries[0] = d / SIGMA_FACTOR;
-//	matrix_C.entries[1] = -battery_param.R1;
-
 	float d[UKF_SIGMA_FACTOR] = {ZERO};
 	for (i = 0; i < UKF_SIGMA_FACTOR; i++) {
 		d[i] = model_get_ratio_from_soc(battery_soc->battery_model, sigma_points.entries[i]);

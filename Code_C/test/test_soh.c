@@ -14,9 +14,9 @@
 
 #define INPUT_SAMPLE_SIZE				1000000
 
-const char *data_file_path = "soh_test_case_2_5.csv";
+const char *data_file_path = "input.csv";
 const char *soh_save_data_file_path = "soh_save_data.csv";
-const char *output_ocv_data_file = "soh_test_result_5.csv";
+const char *output_ocv_data_file = "soh_test_result_2_1.csv";
 
 static BMS_Input_Vector input_vector[INPUT_SAMPLE_SIZE];
 static SOH_Save_Data soh_input_vector[200];
@@ -134,7 +134,7 @@ int hal_entry(void) {
 		bms_update_soh(&bms_soh, (bms_soc.output.SOC_f/100.0f), bms_soc.filter.avg_pack_current);
 	    bms_soc.soh = bms_soh.soh / 100.0f;
 	    save_cnt++;
-		if(save_cnt == 100){
+		if(save_cnt == 1200){
 		    save_est_data(output_ocv_data_file, bms_soc.input.pack_voltage, bms_soc.input.pack_current, out_file);
 		    save_cnt = 0;
 		}

@@ -161,7 +161,7 @@ void process_handle(char* buff, __attribute__((unused)) uint32_t len){
         bms_soh.c3 = 1338.027667f;
         bms_soh.delta_x = 0.0f;
         bms_soh.delta_y = 0.0f;
-        bms_soh.est_capacity = 4.8f;
+        bms_soh.est_capacity = 4.32f;
         bms_soh.last_soc = model_get_soc_from_ocv(bms_soc.battery_model,
                                                   (float) bms_soc.input.pack_voltage / PACK_VOLTAGE_NORMALIZED_GAIN);
         bms_soh.soh = 100.0f;
@@ -178,8 +178,8 @@ void process_handle(char* buff, __attribute__((unused)) uint32_t len){
         for (int j = 0; j < SOC_PERIOD; j++) {
             ukf_update(&bms_soc);
         }
-//        bms_update_soh(&bms_soh, (bms_soc.output.SOC_f/100.0f), bms_soc.filter.avg_pack_current);
-//        bms_soc.soh = bms_soh.soh / 100.0f;
+        bms_update_soh(&bms_soh, (bms_soc.output.SOC_f/100.0f), bms_soc.filter.avg_pack_current);
+        bms_soc.soh = bms_soh.soh / 100.0f;
 
         save_cnt++;
         if(save_cnt == 1200){

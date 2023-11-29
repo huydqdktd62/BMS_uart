@@ -94,7 +94,7 @@ static int32_t save_est_data(const char *file_path, const uint32_t pack_voltage,
 		fprintf(out_file, "%d,", (int32_t)(soc_parameter.estimate_state_entries[i]*1000000.0f));
 
 	for (i = 0; i < 9; i++)
-		fprintf(out_file, "%d,", (int32_t)(soc_parameter.state_covariance_entries[i]*10000000000.0f));
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.state_covariance_entries[i]*10000000.0f));
 
 	for (i = 0; i < 21; i++)
 		fprintf(out_file, "%d,", (int32_t)(soc_parameter.sigma_points_entries[i]*1000000.0f));
@@ -102,13 +102,15 @@ static int32_t save_est_data(const char *file_path, const uint32_t pack_voltage,
             (int32_t)(soc_parameter.priori_estimate_state_entries[1]*1000000.0f),
             (int32_t)(soc_parameter.priori_estimate_state_entries[2]*1000000.0f));
 	for (i = 0; i < 21; i++)
-		fprintf(out_file, "%d,", (int32_t)(soc_parameter.sigma_state_error_entries[i]*1000000000.0f));
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.sigma_state_error_entries[i]*1000000.0f));
 	fprintf(out_file, "%d,%d,", (int32_t)(soc_parameter.measurement_cov*1000000.0f),
             (int32_t)(soc_parameter.est_measurement*1000000.0f));
+//	fprintf(out_file, "%.5f,%d,", (soc_parameter.measurement_cov),
+//            (int32_t)(soc_parameter.est_measurement*1000000.0f));
 	for (i = 0; i < 3; i++)
 		fprintf(out_file, "%d,", (int32_t)(soc_parameter.cross_covariance_entries[i]*1000000000.0f));
 	for (i = 0; i < 3; i++)
-		fprintf(out_file, "%d,", (int32_t)(soc_parameter.aukf_kalman_gain_entries[i]*1000000000.0f));
+		fprintf(out_file, "%d,", (int32_t)(soc_parameter.aukf_kalman_gain_entries[i]*1000000.0f));
 	for (i = 0; i < 9; i++)
 		fprintf(out_file, "%d,", (int32_t)(soc_parameter.matrix_A_entries[i]*1000000.0f));
 	for (i = 0; i < 6; i++)
