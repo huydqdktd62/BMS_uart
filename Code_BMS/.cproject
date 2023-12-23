@@ -172,8 +172,8 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1900880215.261789579" name="test.c" rcbsApplicability="disable" resourcePath="src/test/test.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433.1247922183">
-						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433.1247922183" name="GNU Arm Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433"/>
+					<fileInfo id="com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1900880215.452728998" name="test.c" rcbsApplicability="disable" resourcePath="src/test/test.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433.850774699">
+						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433.850774699" name="GNU Arm Cross C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.1728428433"/>
 					</fileInfo>
 					<folderInfo id="com.renesas.cdt.managedbuild.gnuarm.config.elf.debug.1900880215.627299297" name="/" resourcePath="src/service/normalize">
 						<toolChain id="com.renesas.cdt.managedbuild.gnuarm.toolchain.elf.debug.393786178" name="GCC ARM Embedded" superClass="com.renesas.cdt.managedbuild.gnuarm.toolchain.elf.debug" unusedChildren="">
@@ -331,7 +331,7 @@
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra_gen"/>
-						<entry excluding="test/test_normalized.c|test/test_squareroot.c|service/normalize|board/uart|hal_entry.c|service/canopen/test|service/canopen/example|service/modbus/tcp|service/modbus/ascii" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="test/test.c|test/test_normalized.c|test/test_squareroot.c|service/normalize|board/uart|hal_entry.c|service/canopen/test|service/canopen/example|service/modbus/tcp|service/modbus/ascii" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
