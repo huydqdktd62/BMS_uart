@@ -36,6 +36,7 @@ RM := rm -rf
 -include src/app/canopen/od/subdir.mk
 -include src/app/canopen/init/subdir.mk
 -include src/app/can2mb_init/subdir.mk
+-include src/app/bms_soc_soh_app/subdir.mk
 -include src/app/subdir.mk
 -include ra_gen/subdir.mk
 -include ra/fsp/src/r_sci_uart/subdir.mk

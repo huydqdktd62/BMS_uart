@@ -16,6 +16,7 @@
 #include "math.h"
 #include "stdio.h"
 #include "soh_lsb.h"
+#include "app/bms_soc_soh_app/bms_soc_soh_init.h"
 
 volatile bool tx_complete = true;
 FIFO_Handle uart_rx_buff;
@@ -24,9 +25,9 @@ char buff_handle[512];
 uint32_t len_handle = 0;
 fsp_err_t err;
 int32_t test_cycles = 1;
-SOC_Parameter soc_parameter;
-static SOH_Estimator bms_soh;
-SOC_UKF bms_soc;
+//SOC_Parameter soc_parameter;
+//static SOH_Estimator bms_soh;
+//SOC_UKF bms_soc;
 
 void uart_write(const uint8_t *buff,uint32_t len);
 void uart_print(const char *Format,...);
@@ -43,7 +44,7 @@ void hal_entry(void)
     uart_print("BMS_SOC,BMS_SOC_f,");
     uart_print("SOH,SOH_f,");
     uart_print("\n");
-    bms_soh.c1
+//    bms_soh.c1
 #if TEST_STR
 #else
     for (uint16_t i = 0; i < 3; i++)
@@ -136,7 +137,7 @@ void process_handle(char* buff, __attribute__((unused)) uint32_t len){
                                                   (float) bms_soc.input.pack_voltage / PACK_VOLTAGE_NORMALIZED_GAIN);
         bms_soh.soh = 100.0f;
 
-        bms_soh_init(&bms_soh, bms_soh.last_soc);
+        bms_soh_init(&bms_soh, bms_soh.last_soc, &soh_save_data);
         bms_soc.soh = bms_soh.soh / 100.0f;
 
         init_flag = 1;
