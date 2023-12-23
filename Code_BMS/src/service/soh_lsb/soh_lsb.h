@@ -42,7 +42,5 @@ void bms_save_soh(SOH_Estimator* p_est, SOH_Save_Data* save_data);
 uint32_t bms_get_soh_i(SOH_Estimator* p_est);
 float bms_get_soh_f(SOH_Estimator* p_est);
 
-//extern SOH_Estimator bms_soh;
-//extern SOH_Save_Data soh_save_data;
 
 #endif /* SERVICE_SOH_LSB_SOH_LSB_H_ */

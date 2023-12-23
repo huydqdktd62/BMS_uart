@@ -32,7 +32,7 @@ void MainWindow::on_bt_connect_clicked()
 {
     if(!serial->isOpen()){
         serial->setPortName(ui->cb_port->currentText());
-        serial->setBaudRate(QSerialPort::Baud9600);
+        serial->setBaudRate(QSerialPort::Baud115200);
         serial->setDataBits(QSerialPort::Data8);
         serial->setStopBits(QSerialPort::OneStop);
         serial->setParity(QSerialPort::NoParity);

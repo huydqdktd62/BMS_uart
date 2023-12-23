@@ -9,6 +9,7 @@
 #include "math_util.h"
 #include "stdlib.h"
 #include "math.h"
+#include "../bms_soc_soh_app/bms_soc_soh_init.h"
 
 void bms_set_soh(SOH_Estimator* p_est, SOH_Save_Data* save_data){
 	p_est->c1 = (float)save_data->c1/SOH_NORMALIZED_GAIN;
@@ -64,6 +65,13 @@ void bms_update_soh(SOH_Estimator* p_est, float soc, int32_t current) {
 			p_est->est_capacity = SOH_NOMINAL_CAPACITY_AS / (HOUR_TO_SECOND * 100.0f);
 		}
 		p_est->soh = 100.0f * p_est->est_capacity * HOUR_TO_SECOND / SOH_NOMINAL_CAPACITY_AS;
+
+        uart_print ("%d,%d,%d,", (int32_t) soh_save_data.c1, (int32_t) soh_save_data.c2, (int32_t) soh_save_data.c3);
+        uart_print ("%d,%d,%d,%d,", (int32_t) soh_save_data.est_capacity, (int32_t) soh_save_data.soh,
+                    (int32_t) soh_save_data.delta_x, (int32_t) soh_save_data.delta_y);
+        uart_print ("%d,%d,%d,\n", (int32_t) soh_save_data.last_soc, (int32_t) soh_save_data.cnt,
+                    (int32_t) soh_save_data.key);
+
 		p_est->delta_x = 0.0f;
 		p_est->delta_y = 0.0f;
 		p_est->cnt = 0;
