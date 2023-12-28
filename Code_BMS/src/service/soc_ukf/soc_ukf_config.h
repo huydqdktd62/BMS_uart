@@ -34,7 +34,7 @@
 #define UKF_C1_INIT_F								(float)(25.8403f*UKF_SAMPLE_TIME_s)
 #define UKF_GAMMA_RATIO								(0.017320508f)
 #define UKF_NOMIMAL_CAPACITY_AS						(15552.0f)//LG cell 17280.0f, Molicel 14400
-#define UKF_CHARGE_ETA_RATIO						(1.0204f)
+#define UKF_CHARGE_ETA_RATIO						(1.0804f)
 #define UKF_DISCHARGE_ETA_RATIO						(1.0413f)
 #define UKF_HYSTERESIS_V							(0.062f)
 #define UKF_HYSTERESIS_ZERO_V						(0.0025f)
@@ -47,7 +47,7 @@
  * UKF Algorithm parameters...
  */
 #define SOC_NORMALIZED_GAIN							(100.0f)
-#define SOC_PERIOD									(70)
+#define SOC_PERIOD									(100)
 #define UKF_DEFAULT_MEASUREMENT_COVARIANCE			(0.0472f)
 #define UKF_SOC_MAX_ERROR_percent					(10.0f)
 #define UKF_SAMPLE_TIME_s							((float)(APP_STATE_MACHINE_UPDATE_TICK_mS*SOC_PERIOD)*0.001f)
@@ -75,7 +75,7 @@
 #define UKF_LOWER_CURRENT_THRESHOLD					(20)
 
 #define UKF_SOH_UPPER_THRESHOLD						(100.0f)
-#define UKF_SOH_LOWER_THRESHOLD						(80.0f)
+#define UKF_SOH_LOWER_THRESHOLD						(90.0f)
 
 #define UKF_SLEEP_CURRENT_THRESHOLD					(55.0f)
 #define UKF_CALIB_CURRENT_THRESHOLD					(60.0f)
