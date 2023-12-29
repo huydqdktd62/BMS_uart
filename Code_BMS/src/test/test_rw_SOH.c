@@ -137,17 +137,17 @@ void process_handle(char *buff, __attribute__((unused))  uint32_t len)
         bms_soh_init (&bms_soh, bms_soc.output.SOC_f / SOC_NORMALIZED_GAIN, &soh_save_data);
         bms_soc.soh = bms_get_soh_f (&bms_soh) / SOC_NORMALIZED_GAIN;
 
-//        uart_print ("SOH config:\n");
-//        uart_print ("c1,c2,c3,est_capacity,soh,");
-//        uart_print ("delta_x,delta_y,last_soc,cnt,key,\n");
-//        uart_print ("%d,%d,%d,", (int32_t) soh_save_data.c1, (int32_t) soh_save_data.c2, (int32_t) soh_save_data.c3);
-//        uart_print ("%d,%d,%d,%d,", (int32_t) soh_save_data.est_capacity, (int32_t) soh_save_data.soh,
-//                    (int32_t) soh_save_data.delta_x, (int32_t) soh_save_data.delta_y);
-//        uart_print ("%d,%d,%d,\n", (int32_t) soh_save_data.last_soc, (int32_t) soh_save_data.cnt,
-//                    (int32_t) soh_save_data.key);
+        uart_print ("SOH config:\n");
+        uart_print ("c1,c2,c3,est_capacity,soh,");
+        uart_print ("delta_x,delta_y,last_soc,cnt,key,\n");
+        uart_print ("%d,%d,%d,", (int32_t) soh_save_data.c1, (int32_t) soh_save_data.c2, (int32_t) soh_save_data.c3);
+        uart_print ("%d,%d,%d,%d,", (int32_t) soh_save_data.est_capacity, (int32_t) soh_save_data.soh,
+                    (int32_t) soh_save_data.delta_x, (int32_t) soh_save_data.delta_y);
+        uart_print ("%d,%d,%d,\n", (int32_t) soh_save_data.last_soc, (int32_t) soh_save_data.cnt,
+                    (int32_t) soh_save_data.key);
 
-        uart_print ("SOC config:\n");
-        uart_print ("SOC,SOC_f,avg_pack_voltage,avg_pack_current,\n");
+//        uart_print ("SOC config:\n");
+//        uart_print ("SOC,SOC_f,avg_pack_voltage,avg_pack_current,\n");
         init_flag = 1;
     }
     else
@@ -179,8 +179,8 @@ void process_handle(char *buff, __attribute__((unused))  uint32_t len)
             }
         }
 //        uart_print ("%d,", test_cycles++);
-        uart_print ("%d,%d,%d,%d,\n", bms_soc.output.SOC, (int32_t) (bms_soc.output.SOC_f * 1000000.0f),
-                    bms_soc.filter.avg_pack_voltage, bms_soc.filter.avg_pack_current);
+//        uart_print ("%d,%d,%d,%d,\n", bms_soc.output.SOC, (int32_t) (bms_soc.output.SOC_f * 1000000.0f),
+//                    bms_soc.filter.avg_pack_voltage, bms_soc.filter.avg_pack_current);
 //        uart_print ("%d,", (int32_t) (soc_parameter.H_param * 1000000.0f));
 //        int i;
 //        for (i = 0; i < 3; i++)
