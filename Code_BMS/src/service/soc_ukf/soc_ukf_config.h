@@ -29,7 +29,6 @@
 /*
  * Battery Model parameters...
  */
-#define UKF_R0_INIT_Omh								(0.022f)
 #define UKF_R1_INIT_Omh								(0.0303f)
 #define UKF_C1_INIT_F								(float)(25.8403f*UKF_SAMPLE_TIME_s)
 #define UKF_GAMMA_RATIO								(0.0123f)

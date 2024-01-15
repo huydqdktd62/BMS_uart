@@ -329,7 +329,6 @@ static void entries_init(SOC_UKF* battery_soc){
 
 	battery_soc->soc_update_cnt_10ms = 1;
 	battery_soc->soc_sleep_cnt_10ms = 0;
-	battery_soc->battery_model->R0 = UKF_R0_INIT_Omh;
 	battery_soc->battery_model->R1 = UKF_R1_INIT_Omh;
 	battery_soc->battery_model->C1 = UKF_C1_INIT_F;
 	*cell_voltage = (float)battery_soc->input.pack_voltage/PACK_VOLTAGE_NORMALIZED_GAIN;
@@ -558,7 +557,9 @@ static void soc_update_ukf(SOC_UKF* battery_soc){
 	Matrix_C.entries[1] = -battery_soc->battery_model->R1;
 
 //	aukf_update_matrix_d();
-	Matrix_D.entries[0] = -battery_soc->battery_model->R0;
+	Matrix_D.entries[0] = -model_get_r0_from_voltage(battery_soc->battery_model,
+			(float) battery_soc->input.pack_voltage
+					/ PACK_VOLTAGE_NORMALIZED_GAIN);
 
 //	aukf_time_update_sigma_measurements();
 	multiply(Matrix_C, sigma_points, sigma_measurements);

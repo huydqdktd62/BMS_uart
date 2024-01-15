@@ -9,6 +9,13 @@
 
 #include "math_util.h"
 
+static const float terminal_lut_values[MODEL_LG_R0_SIZE] = { 3.2045f, 3.4575f,
+		3.5124f, 3.6017f, 3.6670f, 3.7486f, 3.8461f, 3.9244f, 4.0300f, 4.0837f,
+		4.1512f };
+
+static const float r0_lut_values[MODEL_LG_R0_SIZE] = { 0.032f, 0.025f, 0.023f,
+		0.022f, 0.022f, 0.022f, 0.022f, 0.023f, 0.023f, 0.023f, 0.028f };
+
 static const float soc_lut_values[MODEL_LG_LUT_SIZE] = { 0.005f, 0.010f,
 		0.015f, 0.020f, 0.025f, 0.030f, 0.035f, 0.040f, 0.045f, 0.050f, 0.055f,
 		0.060f, 0.065f, 0.070f, 0.075f, 0.080f, 0.085f, 0.090f, 0.095f, 0.100f,
@@ -88,14 +95,31 @@ static const float derivative_lut_values[MODEL_LG_LUT_SIZE] = { 3.5812f,
 		0.3612f, 0.4037f, 0.4575f, 0.4762f, 0.5724f, 0.6287f, 0.6800f, 0.7637f,
 		0.8700f, 0.9800f, 1.1324f, 1.2600f, 1.4474f, 3.3299f, 3.7825f, 3.7825f };
 
+float model_get_r0_from_voltage(Battery_Model* model, float voltage){
+	uint16_t index;
+	float terminal = voltage;
+	if (terminal < model->p_terminal_lut_values[0]){
+		return model->p_r0_lut_values[0];
+	}
+	if (terminal > model->p_terminal_lut_values[model->r0_size - 1]){
+		return model->p_r0_lut_values[model->r0_size - 1];
+	}
+	for (index = 0; index < model->r0_size; index++) {
+		if (terminal <= model->p_ocv_lut_values[index]) {
+			break;
+		}
+	}
+	return model->p_r0_lut_values[index];
+}
+
 float model_get_soc_from_ocv(Battery_Model* model, float ocv){
 	uint16_t index;
 	float OCV = ocv;
 	if (OCV < model->p_ocv_lut_values[0])
 		OCV = model->p_ocv_lut_values[0];
-	if (OCV > model->p_ocv_lut_values[model->size - 1])
-		OCV = model->p_ocv_lut_values[model->size - 1];
-	for (index = 0; index < model->size; index++) {
+	if (OCV > model->p_ocv_lut_values[model->soc_size - 1])
+		OCV = model->p_ocv_lut_values[model->soc_size - 1];
+	for (index = 0; index < model->soc_size; index++) {
 		if (OCV <= model->p_ocv_lut_values[index]) {
 			break;
 		}
@@ -106,9 +130,9 @@ float model_get_ocv_from_soc(Battery_Model* model, float soc){
 	int32_t index = 0;
 	if (soc < model->p_soc_lut_values[0])
 		soc = model->p_soc_lut_values[0];
-	if (soc > model->p_soc_lut_values[model->size - 1])
-		soc = model->p_soc_lut_values[model->size - 1];
-	index = binary_search_f(soc, model->p_soc_lut_values, model->size);
+	if (soc > model->p_soc_lut_values[model->soc_size - 1])
+		soc = model->p_soc_lut_values[model->soc_size - 1];
+	index = binary_search_f(soc, model->p_soc_lut_values, model->soc_size);
 	return model->p_ocv_lut_values[index];
 }
 float model_get_ratio_from_soc(Battery_Model* model, float soc){
@@ -120,10 +144,10 @@ float model_get_ratio_from_soc(Battery_Model* model, float soc){
 	if (SOC < model->p_soc_lut_values[0]) {
 		SOC = model->p_soc_lut_values[0];
 	}
-	if (SOC > model->p_soc_lut_values[model->size - 1]) {
-		SOC = model->p_soc_lut_values[model->size - 1];
+	if (SOC > model->p_soc_lut_values[model->soc_size - 1]) {
+		SOC = model->p_soc_lut_values[model->soc_size - 1];
 	}
-	for (i = 0; i < model->size; i++) {
+	for (i = 0; i < model->soc_size; i++) {
 		if (SOC <= model->p_soc_lut_values[i]) {
 			docv = (SOC - model->p_soc_lut_values[i]) * model->p_derivative_lut_values[i];
 			ratio = (model->p_ocv_lut_values[i] + docv) / SOC;
@@ -135,11 +159,12 @@ float model_get_ratio_from_soc(Battery_Model* model, float soc){
 
 
 Battery_Model LG_Model = {
+		.p_r0_lut_values = r0_lut_values,
+		.p_terminal_lut_values = terminal_lut_values,
 		.p_soc_lut_values = soc_lut_values,
 		.p_ocv_lut_values = ocv_lut_values,
 		.p_derivative_lut_values = derivative_lut_values,
-		.size = MODEL_LG_LUT_SIZE,
-		.R0 = UKF_R0_INIT_Omh,
+		.soc_size = MODEL_LG_LUT_SIZE,
 		.R1 = UKF_R1_INIT_Omh,
 		.C1 = UKF_C1_INIT_F
 };
