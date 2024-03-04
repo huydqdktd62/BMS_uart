@@ -449,7 +449,7 @@
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra_gen"/>
-						<entry excluding="app/file|board/flash_drv_hw|board/ra_board|service/soc_soh_logger|test/test.c|test/test_normalized.c|test/test_squareroot.c|service/normalize|board/uart|hal_entry.c|service/canopen/test|service/canopen/example|service/modbus/tcp|service/modbus/ascii" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="test/test_rw_SOH.c|app/file|board/flash_drv_hw|board/ra_board|service/soc_soh_logger|test/test.c|test/test_normalized.c|test/test_squareroot.c|service/normalize|board/uart|hal_entry.c|service/canopen/test|service/canopen/example|service/modbus/tcp|service/modbus/ascii" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
